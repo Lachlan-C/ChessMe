@@ -3,13 +3,6 @@ import React from 'react';
 import GameController from './GameController'
 
 class Game extends React.Component {
-constructor()
-{
-    super()
-
-
-}
-
     render()
     {
         return (

@@ -2,6 +2,14 @@ import React from 'react';
 import CreateGame from './components/CreateGame/CreateGame'
 import GameHistory from './components/GameHistory/GameHistory'
 import Login from './components/Login/Login'
+import Header from './components/Header/Header'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+} from "react-router-dom";
+
+
 
 class App extends React.Component {
     constructor () {
@@ -34,10 +42,20 @@ class App extends React.Component {
     render()
     {
         return (
-          <div>
-            <GameHistory/>
-            {/* <Login/> */}
-          </div>
+            <Router>
+              <Header />
+              <Switch>
+                <Route path="/game-history">
+                  <GameHistory/>
+                </Route>
+                <Route path="/login">
+                  <Login/>
+                </Route>
+                <Route path="/create-game">
+                  <CreateGame/>
+                </Route>
+              </Switch>
+          </Router>
         )
     }
 }

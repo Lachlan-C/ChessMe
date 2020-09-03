@@ -20,7 +20,7 @@ class Games extends React.Component {
     render()
     {
         const Games = this.gamesArray.map((item) => (
-        <GameCard status={item.status} date={item.DateTime} gameID={item.gameID} onClick="ShowCardFunctionHere"/>
+        <GameCard key={item.gameID} status={item.status} date={item.DateTime} gameID={item.gameID} onClick="ShowCardFunctionHere"/>
         ))
 
         return (

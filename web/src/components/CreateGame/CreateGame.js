@@ -1,7 +1,6 @@
 import React from 'react';
 import Team from './Team';
 import Challenger from './Challenger';
-import Chessboard from "chessboardjsx";
 
 
 class CreateGame extends React.Component {
