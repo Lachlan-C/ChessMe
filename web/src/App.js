@@ -3,6 +3,7 @@ import CreateGame from './components/CreateGame/CreateGame'
 import GameHistory from './components/GameHistory/GameHistory'
 import Login from './components/Login/Login'
 import Header from './components/Header/Header'
+import Game from './components/Game/Game'
 import {
   BrowserRouter as Router,
   Switch,
@@ -53,6 +54,9 @@ class App extends React.Component {
                 </Route>
                 <Route path="/create-game">
                   <CreateGame/>
+                </Route>
+                <Route path="/">
+                  <Game />
                 </Route>
               </Switch>
           </Router>

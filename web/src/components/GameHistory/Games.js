@@ -8,13 +8,17 @@ class Games extends React.Component {
             gameID: "43",
             status: "Lose",
             DateTime: "26/04/20"
+        },
+        {
+            gameID: "666",
+            status: "Win",
+            DateTime: "16/06/2019"
+        },
+        {
+            gameID: "82",
+            status: "Win",
+            DateTime: "13/04/2019"
         }
-        // },
-        // {
-        //     gameID: "666",
-        //     status: "Win",
-        //     DateTime: "16/06/2019"
-        // }
     ]
     
 

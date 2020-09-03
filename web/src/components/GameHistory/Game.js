@@ -2,22 +2,28 @@ import Chessboard from "chessboardjsx";
 import React from 'react';
 import GameController from './GameController'
 
+
+
 class Game extends React.Component {
     constructor()
     {
         super()
 
         this.state = {
-            position: 'start'
+            position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
+            undo: true
         }
         this.stepForward = this.stepForward.bind(this)
         this.stepBack = this.stepBack.bind(this)
     }
+    
 
+    
     stepForward()
     {
         this.setState({
-            position: 'rnbqkbnr/pppppppp/8/8/6P1/8/PPPPPPP1/RNBQKBNR'
+        
+            position: 'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
         })
     }
 
@@ -34,9 +40,14 @@ class Game extends React.Component {
         return (
             <div>
                 <textarea id="moves" name="moves"></textarea>
+
                 <Chessboard position={this.state.position}
-                    transitionDuration={20}
-                />
+                    id="random"
+                    undo={this.state.undo}
+                    onPieceClick={this.onDragStart}
+                    onDrop={this.onDrop}/>
+
+                {/* <WithMoveValidation/> */}
 
                 <div className="input-group mb-3">
                     <div className="input-group-prepend">
@@ -44,7 +55,6 @@ class Game extends React.Component {
                     </div>
                         <input type="text" placeholder="difficulty"></input>
                 </div>
-
                     <GameController stepForward={this.stepForward} stepBack={this.stepBack}/>
                     <button className="btn btn-success">Replay</button>
             </div>  
