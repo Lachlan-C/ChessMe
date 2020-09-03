@@ -24,14 +24,19 @@ class Challenger extends React.Component {
     {
         return (
         <div>
-        <div onChange={this.handleChange}>
-            <input type="radio" name="isCPU" value="true" id="CPU"></input>
-
-            <input type="radio" name="isCPU" id="USER" value="false"></input>
-            
+        <div className="input-group" onChange={this.handleChange}>
+        <div className="btn-group">
+            <label className="btn btn-light" htmlFor="USER">
+                <input  type="radio" name="isCPU" id="USER"></input>
+            CPU</label>    
+            <label className="btn btn-light" htmlFor="CPU">
+                <input type="radio" name="isCPU" id="CPU"></input>
+            User</label>
         </div>
 
-        {this.state.isCPU ? <input type="range"></input> : <input type="text"></input>}
+        </div>
+        <input className="form-control" type="text" placeholder={this.state.isCPU ? "difficulty" : "user-id"}></input>
+
         </div>
 
         )

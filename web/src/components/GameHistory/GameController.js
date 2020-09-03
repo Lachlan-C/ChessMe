@@ -14,10 +14,10 @@ class GameController extends React.Component {
     {
         return (
             <div className="btn-group">
-                <button className="btn btn-light">+Step</button>
+                <button className="btn btn-light" onClick={this.props.stepForward}>+Step</button>
                 <button className="btn btn-light">Play</button>
                 <button className="btn btn-light">Pause</button>
-                <button className="btn btn-light">-Step</button>
+                <button className="btn btn-light" onClick={this.props.stepBack}>-Step</button>
             </div>
         )
     }   

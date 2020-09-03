@@ -22,8 +22,8 @@ class Team extends React.Component {
     render()
     {
         return (
-            <div className="input-group-text" style={{backgroundColor: this.state.isBlack ? "black" : "white"}}>
-                <button className="btn" onClick={this.handleClick}>Team</button> 
+            <div className="input" style={{backgroundColor: this.state.isBlack ? "black" : "white", border:"1px solid black"}}>
+                <button className="btn btn-primary" onClick={this.handleClick}>Team</button> 
             </div>
         )
     }   

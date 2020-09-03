@@ -15,12 +15,14 @@ class CreateGame extends React.Component {
     render()
     {
         return (
-            <div>
-
+            <div className="container">
+            <h1>Create Game</h1>
+                
                 <Challenger/> 
+                <br></br>
                 <Team/>
-
-                <button >Create Game</button> 
+                <br></br>
+                <button className="btn btn-success">Create Game</button> 
             </div>
         )
     }   
