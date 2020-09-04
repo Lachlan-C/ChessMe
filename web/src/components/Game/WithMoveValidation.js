@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import PropTypes from "prop-types";
 import Chess from "chess.js"; // import Chess from  "chess.js"(default) if recieving an error about new Chess() not being a constructor
-
+import $ from 'jquery'
 import Chessboard from "chessboardjsx";
 
 class HumanVsHuman extends Component {
   static propTypes = { children: PropTypes.func };
 
   state = {
-    fen: "start",
+    fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1",
     // square styles for active drop square
     dropSquareStyle: {},
     // custom square styles
@@ -24,6 +24,27 @@ class HumanVsHuman extends Component {
   componentDidMount() {
     this.game = new Chess();
   }
+  
+  //Validate Movement, Update Board if Move is Valid
+  onDrop = ({ sourceSquare, targetSquare }) => {
+    // see if the move is legal
+    $.post(`${process.env.REACT_APP_API_URL}/move`, { FEN: this.state.fen, from: targetSquare, to: sourceSquare }).then(response => {
+      console.log(response)  
+    //break if nothing needs to be changed eg. illegal move   
+    if (response.valid !== 'Legal') {return}
+    this.setState(() => ({
+      //Update the board!
+      fen: response.FEN
+    }));
+  }
+)};  
+
+
+
+
+
+
+
 
   // keep clicked square style and remove hint squares
   removeHighlightSquare = () => {
@@ -58,40 +79,11 @@ class HumanVsHuman extends Component {
     }));
   };
 
-  onDrop = ({ sourceSquare, targetSquare }) => {
-    // see if the move is legal
-    let move = this.game.move({
-      from: sourceSquare,
-      to: targetSquare,
-      promotion: "q" // always promote to a queen for example simplicity
-    });
 
-    // illegal move
-    if (move === null) return;
-    this.setState(({ history, pieceSquare }) => ({
-      fen: this.game.fen(),
-      history: this.game.history({ verbose: true }),
-      squareStyles: squareStyling({ pieceSquare, history })
-    }));
-  };
 
-  onMouseOverSquare = square => {
-    // get list of possible moves for this square
-    let moves = this.game.moves({
-      square: square,
-      verbose: true
-    });
 
-    // exit if there are no moves available for this square
-    if (moves.length === 0) return;
 
-    let squaresToHighlight = [];
-    for (var i = 0; i < moves.length; i++) {
-      squaresToHighlight.push(moves[i].to);
-    }
 
-    this.highlightSquare(square, squaresToHighlight);
-  };
 
   onMouseOutSquare = square => this.removeHighlightSquare(square);
 
@@ -112,7 +104,7 @@ class HumanVsHuman extends Component {
     return this.props.children({
       squareStyles,
       position: fen,
-      onMouseOverSquare: this.onMouseOverSquare,
+      // onMouseOverSquare: this.onMouseOverSquare,
       onMouseOutSquare: this.onMouseOutSquare,
       onDrop: this.onDrop,
       dropSquareStyle,
@@ -128,7 +120,7 @@ export default function WithMoveValidation() {
         {({
           position,
           onDrop,
-          onMouseOverSquare,
+          //onMouseOverSquare,
           onMouseOutSquare,
           squareStyles,
           dropSquareStyle,
@@ -138,7 +130,7 @@ export default function WithMoveValidation() {
             id="humanVsHuman"
             position={position}
             onDrop={onDrop}
-            onMouseOverSquare={onMouseOverSquare}
+            // onMouseOverSquare={onMouseOverSquare}
             onMouseOutSquare={onMouseOutSquare}
             squareStyles={squareStyles}
             dropSquareStyle={dropSquareStyle}
