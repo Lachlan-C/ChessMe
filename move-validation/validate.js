@@ -9,6 +9,13 @@ app.use(bodyParser.urlencoded({
 }))
 app.use(bodyParser.json())
 
+//Cross-Origin Request Headers
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 const port = process.env.PORT || 5000;
 
 function onDrop (source, target) {
@@ -32,7 +39,7 @@ app.post('/validate/move', (req, res) => {
         FEN
     } = req.body;
     game = new Chess(FEN);
-    res.send(onDrop(to,from));
+    res.send({valid: onDrop(to,from), FEN: game.fen()});
 });
 
 app.listen(port, () => {
