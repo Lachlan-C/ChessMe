@@ -4,6 +4,8 @@ import GameHistory from './components/GameHistory/GameHistory'
 import Login from './components/Login/Login'
 import Header from './components/Header/Header'
 import Game from './components/Game/Game'
+import Registration from './components/Registration/Registration'
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -48,6 +50,9 @@ class App extends React.Component {
               <Switch>
                 <Route path="/game-history">
                   <GameHistory/>
+                </Route>
+                <Route path="/registration">
+                  <Registration/>
                 </Route>
                 <Route path="/login">
                   <Login/>
