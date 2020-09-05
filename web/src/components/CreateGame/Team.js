@@ -2,28 +2,11 @@ import React from 'react';
 
 
 class Team extends React.Component {
-    constructor() 
-    {
-        super()
-        this.state = {
-            isBlack: true
-        }
-    
-        this.handleClick = this.handleClick.bind(this)
-    }
-
-    handleClick() 
-    {
-        this.setState((prevState) => ({
-            isBlack: !prevState.isBlack
-        }))
-    }
-
     render()
     {
         return (
-            <div className="input" style={{backgroundColor: this.state.isBlack ? "black" : "white", border:"1px solid black"}}>
-                <button className="btn btn-primary" onClick={this.handleClick}>Team</button> 
+            <div name="Team" className="input" onClick={(e) => (this.props.handleClick(e))} style={{backgroundColor: this.props.Team, border:"1px solid black"}}>
+                <h4 style={{color: 'grey'}}className="text-center">Select Team</h4>
             </div>
         )
     }   
