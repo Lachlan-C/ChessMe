@@ -1,6 +1,7 @@
 
 // DISCUSS WHETHER TO MERGE WITH MOVE_VALIDATION: CHANGES DATA STRUCTURE/COMPLEXITY.
-
+const { Chess } = require('chess.js');
+var chessGame = new Chess();
 
 const mqtt = require('mqtt');
 const express = require('express');
@@ -30,7 +31,7 @@ app.use((req,res,next)=> {
     next();
 });
 
-const port = PORT || 5002;
+const port = process.env.PORT || 5000;
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -39,6 +40,31 @@ app.use(bodyParser.urlencoded({
 
 const client = mqtt.connect(BROKER);
 
+//Move Validation Relocated
+function onDrop (source, target) {
+    var move = chessGame.move({
+      from: source,
+      to: target,
+      promotion: 'q' 
+    })
+  
+    if (move === null) {
+    return 'Illegal'
+    } else {
+    return 'Legal'
+    }
+  }
+  
+  app.post('/validate/move', (req, res) => {
+      const {
+          to,
+          from,
+          FEN
+      } = req.body;
+      chessGame = new Chess(FEN);
+      res.send({valid: onDrop(to,from), FEN: chessGame.fen()});
+  });
+  
 app.post('/validate/move', (req,res)=> {
 
     //Posts to External Device
@@ -62,6 +88,10 @@ client.on('message', (topic, message) => {
         });
     }
 })
+
+app.listen(port, () => {
+    console.log(`listening on port ${port}`);
+});
 
 
 
