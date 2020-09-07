@@ -2,13 +2,13 @@ import React from 'react';
 import $ from 'jquery'
 import Chessboard from "chessboardjsx";
 
-class Game extends React.Component {
+class WithMoveValidation extends React.Component {
     constructor() 
     {
-    super()
-    this.state = {
-        fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-    }
+        super()
+        this.state = {
+            fen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        }
     } 
 
 
@@ -39,4 +39,4 @@ class Game extends React.Component {
 }
 
 
-export default Game;
+export default WithMoveValidation;
