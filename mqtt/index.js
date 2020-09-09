@@ -6,10 +6,8 @@ const bodyParser = require('body-parser');
 
 dotenv.config();
 
-const {MONGO_URL} = process.env;
-const {PORT} = process.env;
-const {BROKER} = process.env;
-const {SUBSCRIBE_PATH} = process.env;
+
+const { MONGO_URL, PORT, BROKER, SUBSCRIBE_PATH } = process.env;
 
 const app = express();
 
@@ -34,24 +32,26 @@ app.use(bodyParser.urlencoded({
 
 const client = mqtt.connect(BROKER)
 
+//Sends a request to pair the board the user
+app.put('/board/pair', (req, res) => {
 
-//Conection confirmation
+})
 
+//Sends game topic to board
+app.put('/game/connect', (req, res) => {
+
+})
+
+//Connection confirmation
 client.on('connect', () => {
     client.subscribe(SUBSCRIBE_PATH, err => {
-        if (!err) console.log('Subscirbed to main branch.');
+        if (!err) console.log('Subscribed to main branch.');
     });
 });
 
 client.on('message', (topic, message) => {
-    console.log("received request");
-
-    //placeholder until we work out where we are sending data.
-    console.log("topic: ",topic);
-    console.log("message: ",message);
+    console.log(`Topic: ${topic}, Message: ${message}`);
 });
-
-//More commands to come, depends on the requirements of the mqtt channel.
 
 
 app.listen(port, () => {
