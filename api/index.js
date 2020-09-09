@@ -79,6 +79,38 @@ engine.onmessage = (data) => {
 })
 //--------------------------------------------------
 
+//Returns Game status
+function updateStatus () {
+    var status = ''
+  
+    var moveColor = 'White'
+    if (game.turn() === 'b') {
+      moveColor = 'Black'
+    }
+  
+    // checkmate?
+    if (game.in_checkmate()) {
+      status = 'Game over, ' + moveColor + ' is in checkmate.'
+    }
+  
+    // draw?
+    else if (game.in_draw()) {
+      status = 'Game over, drawn position'
+    }
+  
+    // game still on
+    else {
+      status = moveColor + ' to move'
+  
+      // check?
+      if (game.in_check()) {
+        status += ', ' + moveColor + ' is in check'
+      }
+    }
+    return status
+}
+//--------------------------------------------------
+
 //Move Validation Relocated
 function onDrop (source, target) {
     var move = chessGame.move({
@@ -96,12 +128,16 @@ function onDrop (source, target) {
 
 app.post('/validate/move', (req, res) => {
     const {
+        //playerID needs to be implemented 
+        //playerid,
         to,
         from,
+        //update fen to read from database
         FEN
     } = req.body;
     chessGame = new Chess(FEN);
-    res.send({valid: onDrop(to,from), FEN: chessGame.fen()});
+    //returns to/from fen and status
+    res.send({valid: onDrop(to,from), FEN: chessGame.fen(), status: updateStatus(),To: to, From: from});
 });
 
 app.post('/chess/moves', (req, res) => {
