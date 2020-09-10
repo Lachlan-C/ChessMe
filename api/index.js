@@ -261,7 +261,7 @@ app.post('user/register', (req,res)=> {
     const {password} = req.body;
     const {userID} = newUserID();
     User.findOne({'username':username}, (err,foundUser)=>{
-        if (err) res.send(existUser);
+        if (err) res.send('existUser');
         else {
             new User({
                 username: username,
