@@ -227,10 +227,10 @@ app.post('/user/login', (req, res)=> {
 //Find users games
 app.get('/user/:userid/games', (req, res) => {
     const { user } = req.params;
-    Game.find({ "Users": "00000001" }, (err, devices) => {
+    Game.find({ "Users": user }, (err, data) => {
         err
         ? res.send(err)
-        : res.send(devices)
+        : res.send(data)
     })
 })
 
