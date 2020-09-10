@@ -10,11 +10,24 @@ class Registration extends React.Component {
         this.state = {
             username: '',
             password: '',
-            confirm: ''
+            confirm: '',
+            response: '',
+            loggedIn: false 
         }
         
         this.handleChange = handleChange.bind(this)
     }
+
+    onRegister() {
+        this.setState(response, '');
+        if(!(this.state.password == this.state.confirm)) this.setState(response, 'passwords do not match');
+        $.post(`${process.env.REACT_APP_API_URL}/user/register`,{'username': this.state.username,'password':this.state.password}).then(response => {
+            if (response == 'existUser') this.setState(response, 'This user already exists');
+            else this.setState(loggedIn, true);
+        });
+    }
+
+
     render()
     {
         return (
@@ -52,7 +65,8 @@ class Registration extends React.Component {
             ></input>
             
             <div id="login-message" className={this.props.error ? "alert alert-danger" : ""}>{this.props.error}</div>
-            <button className="btn btn-success">Register</button>
+            <button className="btn btn-success" onClick='onRegister'>Register</button>
+            <div id="Response">{this.state.response}</div>
             
             <p>Already have an account? Login <Link to="/login">here</Link></p>
         </div>
