@@ -13,6 +13,7 @@
     "chess.js": "^0.11.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "math": "0.0.3",
     "mongoose": "^5.10.3",
     "stockfish": "^10.0.2",
     "swagger-jsdoc": "^4.0.0",

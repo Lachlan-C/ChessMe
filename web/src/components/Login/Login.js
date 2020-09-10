@@ -20,10 +20,10 @@ class Login extends React.Component {
     }
 
     onLogin(){
-        this.state.response = '';
-        $.post(`${process.env.REACT_APP_API_URL}/user/login`, {username: this.state.username, password: this.state.password}).then(response => {
-            if (response == 'userError') this.setState({response: "username does not exist"});
-            else if(response == 'passError') this.setState({response: "password is incorrect"});
+        this.setState({response: ""})
+        $.post(`${process.env.REACT_APP_API_URL}/user/login`,{'username': this.state.username, 'password': this.state.password}).then(response => {
+            if (response === 'userError') this.setState({response: "username does not exist"});
+            else if(response === 'passError') this.setState({response: "password is incorrect"});
             else this.setState({loggedIn: true});
         });
     }

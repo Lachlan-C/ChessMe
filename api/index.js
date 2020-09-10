@@ -1,4 +1,4 @@
-
+var math = require('math');
 var stockfish = require('stockfish');
 
 
@@ -160,14 +160,6 @@ function onDrop (source, target) {
     }
 }
 
-function newUserID() {
-    const newID = (math.random()*math.floor(99999999));
-    User.findOne({'userID': newID},(err,foundUser)=>{
-        if(foundUser) return newUserID();
-        else return newID;
-    });
-}
-
 app.post('/validate/move', (req, res) => {
 
     const {
@@ -235,8 +227,8 @@ app.post('/user/login', (req, res)=> {
     const {password} = req.body;
 
     User.findOne({'username': username},(err,loggedUser)=>{
-        if(err) res.send('userError');
-        if (loggedUser.password == password) {
+        if (!loggedUser) res.send('userError');
+        else if (loggedUser.password == password) {
             return res.send('loggedIn');
         }else{
             return res.send('passError');
@@ -256,18 +248,24 @@ app.get('/user/:userid/games', (req, res) => {
 
 
 //Requests a new user. This checks the username against existing users
-app.post('user/register', (req,res)=> {
+app.post('/user/register', (req,res)=> {
+
     const {username} = req.body;
     const {password} = req.body;
-    const {userID} = newUserID();
-    User.findOne({'username':username}, (err,foundUser)=>{
-        if (err) res.send('existUser');
-        else {
-            new User({
-                username: username,
-                password: password,
-                userID: userID
-            }).save();
+    const newID = math.floor(math.random()*math.floor(99999999));
+    User.findOne({'userID':newID}, (err, foundID)=>{
+        if(foundID) res.send('idInvalid');
+        else{
+            User.findOne({'username':username}, (err,foundUser)=>{
+                if (foundUser) res.send('existUser');
+                else {
+                    new User({
+                        username: username,
+                        password: password,
+                        userID: newID
+                    }).save();
+                }
+            });
         }
     });
 });
