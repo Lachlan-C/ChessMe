@@ -1,6 +1,5 @@
 const mqtt = require('mqtt');
 const express = require('express');
-const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const fetch = require('node-fetch')
@@ -8,14 +7,10 @@ const fetch = require('node-fetch')
 dotenv.config();
 
 
-const { MONGO_URL, PORT, BROKER, SUBSCRIBE_PATH } = process.env;
+const { PORT, BROKER, MQTT_PATH } = process.env;
 
 const app = express();
 
-mongoose.connect(MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true});
-
-const user = require(`./models/user`);
-const game = require(`./models/game`);
 const { json } = require('body-parser');
 const { response } = require('express');
 
@@ -35,7 +30,15 @@ app.use(bodyParser.urlencoded({
 
 const client = mqtt.connect(BROKER)
 
-//Sends a request to pair the board the user
+//Connection confirmation
+client.on('connect', () => {
+    client.subscribe(`${MQTT_PATH}/#`, err => {
+        if (!err) console.log(`Subscribed to ${MQTT_PATH}/#`);
+    });
+});
+
+
+//Sends a message to pair the board the user
 app.put('/board/pair', (req, res) => {
 
 })
@@ -45,6 +48,7 @@ app.put('/game/connect', (req, res) => {
 
 })
 
+//Publish message to topic
 function send(topic, msg)
 {
     client.publish(topic, msg, () => {
@@ -52,18 +56,22 @@ function send(topic, msg)
     });
 }
 
-//validates the move
+//Validates a move
 function validate(body)
 {
-    //atm it needs to, from, FEN,
+    //atm it needs to, from
+    //Will need userID in future to validate which user the message is coming from
     fetch('http://localhost:5000/validate/move', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
     .then(response => response.json())
     .then(json => 
         {
+            console.log("Response:")
             console.log(json)
             //expected response {move: 'e2e3', status: 'white turn', userID: ['xxx', 'yyy']}
             //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
-            send(`${SUBSCRIBE_PATH}/game/${body.gameID}`, json) 
+
+            send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+
             //get gameID from body.gameID
             //here send message back to game channel w/ both user identifiers if valid move
         })
@@ -77,15 +85,20 @@ function pieceMoves(body)
         .then(response => response.json())
         .then(json => 
             {
+                console.log("Response:")
                 console.log(json)
                 //expected response {moves: [e2, e3], userID: ['xxx']}
                 //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
-                send(`${SUBSCRIBE_PATH}/game/${body.gameID}`, json) 
+
+                send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+
                 //get gameID from body.gameID
                 //here send message back to game channel w/ user identifier
             })
 }
 
+
+//Gives the user a move hint with stockfish
 function hint(body)
 {
     //atm it needs FEN
@@ -93,21 +106,18 @@ function hint(body)
     .then(response => response.json())
     .then(json => 
         {
+            console.log("Response:")
             console.log(json)
             //expected response {move: 'e2e3', userID: ['xxx']}
             //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
-            send(`${SUBSCRIBE_PATH}/game/${body.gameID}`, json) 
+
+            send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+            
             //get gameID from body.gameID
             //here send message back to game channel with user identifier
         })
 }
 
-//Connection confirmation
-client.on('connect', () => {
-    client.subscribe(`${SUBSCRIBE_PATH}/#`, err => {
-        if (!err) console.log('Subscribed to main branch.');
-    });
-});
 
 client.on('message', (topic, message) => {
     topic = topic.slice(1).split('/')
@@ -117,10 +127,10 @@ client.on('message', (topic, message) => {
         const messageJSON = JSON.parse(message)
         if (topic[2].match(`game`))
         {
-            messageJSON.gameID = topic[3]
+            messageJSON.GameID = topic[3]
+            console.log("Message:")
             console.log(messageJSON)
             
-
             if (messageJSON.request === 'validate')
                 validate(messageJSON)
             else if(messageJSON.request === 'piecemoves')
@@ -162,7 +172,9 @@ client.on('message', (topic, message) => {
             */  
         }
     }
-    console.log(`Topic: ${topic}, Message: ${message}`);
+    //Useful for Debugging
+    //console.log(`Topic: ${topic}, Message: ${message}`);
+
 });
 
 
