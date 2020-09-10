@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { handleChange } from '../../Helpers'
+import $ from 'jquery';
 
 
 class Login extends React.Component {
@@ -55,7 +56,7 @@ class Login extends React.Component {
             ></input>
             
             <div id="login-message" className={this.props.error ? "alert alert-danger" : ""}>{this.props.error}</div>
-            <button className="btn btn-success" onClick='onLogin'>Login</button>
+            <button className="btn btn-success" onClick={onLogin}>Login</button>
             <div id='Reponse'>{this.state.response}</div>
             
             <p>Don't have an account? Create one <Link to="/registration">here</Link></p>
