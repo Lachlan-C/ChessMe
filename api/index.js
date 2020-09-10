@@ -1,6 +1,11 @@
 
 var stockfish = require('stockfish');
 
+
+const swaggerOptions = require('./swagger-options');
+const swaggerJsDoc = require('swagger-jsdoc');
+const swaggerUI = require('swagger-ui-express');
+
 const { Chess } = require('chess.js');
 var chessGame = new Chess();
 
@@ -31,6 +36,10 @@ app.use((req,res,next)=> {
     next();
 });
 
+const swaggerDocs = swaggerJsDoc(swaggerOptions); 
+app.use('/docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+
+
 const port = PORT || 5000;
 
 app.use(bodyParser.json());
@@ -40,7 +49,18 @@ app.use(bodyParser.urlencoded({
 
 
 
-//Test API is running properly!
+
+/**
+* @swagger
+* /test:
+*   get: 
+*       description: Testing API
+*       tags:
+*           - Testing
+*       responses:
+*           '200':
+*               description: I am the tester!.
+*/
 app.get('/test', (req,res) => {
     res.send('I am the tester!')
 })
