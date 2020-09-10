@@ -84,17 +84,17 @@ function updateStatus () {
     var status = ''
   
     var moveColor = 'White'
-    if (game.turn() === 'b') {
+    if (chessGame.turn() === 'b') {
       moveColor = 'Black'
     }
   
     // checkmate?
-    if (game.in_checkmate()) {
+    if (chessGame.in_checkmate()) {
       status = 'Game over, ' + moveColor + ' is in checkmate.'
     }
   
     // draw?
-    else if (game.in_draw()) {
+    else if (chessGame.in_draw()) {
       status = 'Game over, drawn position'
     }
   
@@ -103,7 +103,7 @@ function updateStatus () {
       status = moveColor + ' to move'
   
       // check?
-      if (game.in_check()) {
+      if (chessGame.in_check()) {
         status += ', ' + moveColor + ' is in check'
       }
     }
