@@ -140,6 +140,14 @@ function onDrop (source, target) {
     }
 }
 
+function newUserID() {
+    const newID = (math.random()*math.floor(99999999));
+    User.findOne({'userID': newID},(err,foundUser)=>{
+        if(foundUser) return newUserID();
+        else return newID;
+    });
+}
+
 app.post('/validate/move', (req, res) => {
 
     const {
@@ -200,6 +208,41 @@ app.post('/chess/moves', (req, res) => {
     chessGame = new Chess(FEN)
     res.send(chessGame.moves({ square: piecePos }))
 });
+
+
+app.post('/user/login', (req, res)=> {
+    const {username} = req.body;
+    const {password} = req.body;
+
+    User.findOne({'username': username},(err,loggedUser)=>{
+        if(err) res.send('userError');
+        if (loggedUser.password == password) {
+            return res.send('loggedIn');
+        }else{
+            return res.send('passError');
+        }
+    });
+});
+
+
+//Requests a new user. This checks the username against existing users
+app.post('user/register', (req,res)=> {
+    const {username} = req.body;
+    const {password} = req.body;
+    const {userID} = newUserID();
+    User.findOne({'username':username}, (err,foundUser)=>{
+        if (err) res.send(existUser);
+        else {
+            new User({
+                username: username,
+                password: password,
+                userID: userID
+            }).save();
+        }
+    });
+});
+
+
 
 app.listen(port, () => {
     console.log(`listening on port ${port}`);

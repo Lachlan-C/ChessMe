@@ -9,11 +9,25 @@ class Login extends React.Component {
         super()
         this.state = {
             username: '',
-            password: ''
+            password: '',
+            loggedIn: false,
+            response: ''
         }
         
         this.handleChange = handleChange.bind(this)
     }
+
+    onLogin({username, password}){
+        this.state.response = '';
+        $.post(`${process.env.REACT_APP_API_URL}/user/login`, {username: username, password: password}).then(response => {
+            if (response == 'userError') this.state.response = "username does not exist";
+            else if(response == 'passError') this.state.response = "password is incorrect";
+            else this.state.loggedIn = true;
+        });
+    }
+
+
+
     render()
     {
         return (
@@ -41,7 +55,8 @@ class Login extends React.Component {
             ></input>
             
             <div id="login-message" className={this.props.error ? "alert alert-danger" : ""}>{this.props.error}</div>
-            <button className="btn btn-success">Login</button>
+            <button className="btn btn-success" onClick='onLogin'>Login</button>
+            <div id='Reponse'>{this.state.response}</div>
             
             <p>Don't have an account? Create one <Link to="/registration">here</Link></p>
         </div>
