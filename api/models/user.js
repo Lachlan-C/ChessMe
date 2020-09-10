@@ -5,4 +5,4 @@ module.exports = mongoose.model('User', new mongoose.Schema({
     username: String,
     pass: String,
     Games: Array
-}));
+}, {collection: 'users'}));

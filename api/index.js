@@ -5,7 +5,11 @@ const { Chess } = require('chess.js');
 var chessGame = new Chess();
 
 const express = require('express');
+//Mongo
 const mongoose = require('mongoose');
+mongoose.set('debug', true);
+
+
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 
@@ -16,8 +20,9 @@ const app = express();
 
 mongoose.connect(MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true});
 
-const user = require(`./models/user`);
-const game = require(`./models/game`);
+const User = require(`./models/user`);
+const Game = require(`./models/game`);
+const { json } = require('express');
 
 app.use(express.static('public'));
 app.use((req,res,next)=> {
@@ -32,6 +37,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: true
 }));
+
+
+
+//Test API is running properly!
+app.get('/test', (req,res) => {
+    res.send('I am the tester!')
+})
 
 
 //movesArray Example:
@@ -73,7 +85,7 @@ engine.onmessage = (data) => {
         //Finds the FEN string
         if (move)
         {
-            res.send(toFEN([move[1]], FEN))
+            res.send({ FEN: toFEN([move[1]], FEN)})
         }
 }
 })
@@ -120,24 +132,64 @@ function onDrop (source, target) {
     })
     
     if (move === null) {
-        return 'Illegal'
+        //Invalid Move
+        return false
     } else {
-        return 'Legal'
+        //Valid Move
+        return true
     }
 }
 
 app.post('/validate/move', (req, res) => {
+
     const {
-        //playerID needs to be implemented 
-        //playerid,
+        UserID,
         to,
         from,
-        //update fen to read from database
-        FEN
+        GameID
     } = req.body;
-    chessGame = new Chess(FEN);
-    //returns to/from fen and status
-    res.send({valid: onDrop(to,from), FEN: chessGame.fen(), status: updateStatus(),To: to, From: from});
+
+    //Need to check if the user is sending a move for the right team!
+    //Likely need an additional field in the database games model!
+
+    //Searches for game with supplied GameID 
+    //@@@@@NOTE: ERROR HANDLING ???? PROBABLY A GOOD IDEA!
+    Game.findOne({GameID: GameID}, (err, data) => {
+
+        //Creates new Game
+        chessGame = new Chess(data.CurrentFen);
+
+        //Updates the Game with the Move/Validates
+        const valid = onDrop(to, from)
+        //Status Check (has someone won?)
+        const status = updateStatus()
+        res.send({
+            valid: valid, 
+            FEN: chessGame.fen(), 
+            status: status,
+            To: to, 
+            From: from,
+            Users: data.Users
+        });
+
+        //Update DB if valid move
+        if (valid)
+        {
+            //Update current board state
+            data.CurrentFen = chessGame.fen()
+            //GameOver Update Winner
+            if (chessGame.game_over())
+                data.Winner = status
+            //Add the move to the moves array
+            data.Moves.push(to+from)
+            
+            //Save the Updates to the DB
+            data.save(err => {
+                if (err) {
+                    console.log(err)
+                }
+            })}
+    })
 });
 
 app.post('/chess/moves', (req, res) => {
