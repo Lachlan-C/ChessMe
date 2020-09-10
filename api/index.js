@@ -224,6 +224,16 @@ app.post('/user/login', (req, res)=> {
     });
 });
 
+//Find users games
+app.get('/user/:userid/games', (req, res) => {
+    const { user } = req.params;
+    Game.find({ "Users": "00000001" }, (err, devices) => {
+        err
+        ? res.send(err)
+        : res.send(devices)
+    })
+})
+
 
 //Requests a new user. This checks the username against existing users
 app.post('user/register', (req,res)=> {
