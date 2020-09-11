@@ -116,9 +116,7 @@ function send(str)
 
 
 app.post('/stockfish/move', (req,res) => {
-const { FEN, difficulty } = req.body 
-if (difficulty)
-    send(`setoption name Skill Level value ${difficulty}`)
+const { FEN } = req.body 
 send(`position fen ${FEN}`)
 send('go')
 
@@ -168,12 +166,11 @@ function updateStatus () {
 //--------------------------------------------------
 
 //Move Validation Relocated
-function onDrop (source, target) {
-    var move = chessGame.move({
-        from: source,
-        to: target,
-        promotion: 'q' 
-    })
+function onDrop (move) {
+    var move = chessGame.move(
+        move, 
+        { sloppy: true, promotion:'q' } 
+    )
     
     if (move === null) {
         //Invalid Move
@@ -221,8 +218,7 @@ app.post('/validate/move', (req, res) => {
 
     const {
         UserID,
-        to,
-        from,
+        move,
         GameID
     } = req.body;
 
@@ -237,15 +233,14 @@ app.post('/validate/move', (req, res) => {
         chessGame = new Chess(data.CurrentFen);
 
         //Updates the Game with the Move/Validates
-        const valid = onDrop(to, from)
+        const valid = onDrop(move)
         //Status Check (has someone won?)
         const status = updateStatus()
         res.send({
             valid: valid, 
             FEN: chessGame.fen(), 
             status: status,
-            To: to, 
-            From: from,
+            move: move,
             Users: data.Users
         });
 
@@ -258,7 +253,7 @@ app.post('/validate/move', (req, res) => {
             if (chessGame.game_over())
                 data.Winner = status
             //Add the move to the moves array
-            data.Moves.push(to+from)
+            data.Moves.push(move)
             
             //Save the Updates to the DB
             data.save(err => {

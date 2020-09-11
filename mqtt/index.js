@@ -70,7 +70,7 @@ function validate(body)
             //expected response {move: 'e2e3', status: 'white turn', userID: ['xxx', 'yyy']}
             //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
 
-            send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+            //send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
 
             //get gameID from body.gameID
             //here send message back to game channel w/ both user identifiers if valid move
@@ -80,7 +80,7 @@ function validate(body)
 //show possible moves for a piece
 function pieceMoves(body)
 {
-        //atm it needs FEN, piecePos
+        //atm it needs GameID, piecePos
         fetch('http://localhost:5000/chess/moves', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
         .then(response => response.json())
         .then(json => 
@@ -90,7 +90,7 @@ function pieceMoves(body)
                 //expected response {moves: [e2, e3], userID: ['xxx']}
                 //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
 
-                send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+                //send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
 
                 //get gameID from body.gameID
                 //here send message back to game channel w/ user identifier
@@ -111,7 +111,7 @@ function hint(body)
             //expected response {move: 'e2e3', userID: ['xxx']}
             //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
 
-            send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+            //send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
             
             //get gameID from body.gameID
             //here send message back to game channel with user identifier
