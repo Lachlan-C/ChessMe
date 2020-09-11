@@ -219,6 +219,36 @@ app.post('/chess/moves', (req, res) => {
     res.send(chessGame.moves({ square: piecePos }))
 });
 
+app.post('/chess/NewGame', (req, res) => {
+    const {
+        PlayerID,
+        EnemyID
+    } = req.body;
+    var newGameID;
+    Game.findOne({
+        "Users": PlayerID,
+        "Winner": ""
+    }, (err, data) => {
+        console.log(data);
+        if (data) 
+        {
+            return res.send("ERROR GAME ALREADY RUNNING");
+        } 
+        else 
+        {
+            newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();
+            var CurrentDate = new Date();
+            new Game({
+                GameID: newGameID,
+                DateTimeStart: CurrentDate,
+                Users: [PlayerID, EnemyID],
+                CurrentFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            }).save();
+            res.send(newGameID);
+        }
+    })
+});
+
 
 app.post('/user/login', (req, res)=> {
     const {username} = req.body;
