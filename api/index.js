@@ -84,6 +84,30 @@ function toFEN(movesArray, FEN)
 }
 
 
+
+
+/**
+ * @swagger
+ * /stockfish/move:
+ *   post: 
+ *       description: Chess engine generate moves
+ *       tags:
+ *           - StockFish
+ *       parameters:
+ *       - name: FEN
+ *         description: FEN string showing current board state    
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: difficulty
+ *         description: StockFish Difficulty
+ *         in: formData
+ *         required: false
+ *         type: int
+ *       responses:
+ *           '200':
+ *               description: {FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'}
+ */
 //StockFISH ---------------------------------------
 var engine = stockfish();
 function send(str)
@@ -94,7 +118,9 @@ function send(str)
 
 
 app.post('/stockfish/move', (req,res) => {
-const { FEN } = req.body 
+const { FEN, difficulty } = req.body 
+if (difficulty)
+    send(`setoption name Skill Level value ${difficulty}`)
 send(`position fen ${FEN}`)
 send('go')
 
@@ -105,7 +131,7 @@ engine.onmessage = (data) => {
         //Finds the FEN string
         if (move)
         {
-            res.send({ FEN: toFEN([move[1]], FEN)})
+            res.send(toFEN([move[1]], FEN))
         }
 }
 })
@@ -160,6 +186,39 @@ function onDrop (source, target) {
     }
 }
 
+
+/**
+ * @swagger
+ * /validate/move:
+ *   post: 
+ *       description: Move and validate a piece
+ *       tags:
+ *           - Logic
+ *       parameters:
+ *       - name: GameID
+ *         description: ID of your game
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: to
+ *         description: Start coordinate of the piece you are moving   
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: from
+ *         description: Destination coordinate of the piece you are moving  
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: UserID
+ *         description: ID of the user sending the move
+ *         in: formData
+ *         required: false
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: {e2, e3}
+ */
 app.post('/validate/move', (req, res) => {
 
     const {
@@ -212,15 +271,62 @@ app.post('/validate/move', (req, res) => {
     })
 });
 
+/**
+ * @swagger
+ * /chess/moves:
+ *   post: 
+ *       description: Show possible moves for a piece
+ *       tags:
+ *           - Logic
+ *       parameters:
+ *       - name: GameID
+ *         description: ID of your game
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: piecePos
+ *         description: Coordinate of piece you want moves for    
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: {e2, e3}
+ */
 app.post('/chess/moves', (req, res) => {
     const {
-        FEN,
+        GameID,
         piecePos
     } = req.body;
-    chessGame = new Chess(FEN)
-    res.send(chessGame.moves({ square: piecePos }))
+    Game.findOne({GameID: GameID}, (err, data) => {
+        chessGame = new Chess(data.CurrentFen)
+        res.send(chessGame.moves({ square: piecePos }))
+    })
 });
 
+
+/**
+ * @swagger
+ * /chess/NewGame:
+ *   post: 
+ *       description: Create a new chess game
+ *       tags:
+ *           - Logic
+ *       parameters:
+ *       - name: PlayerID
+ *         description: ID of the user creating the game
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: EnemyID
+ *         description: ID of the player you intend to vs, leave blank if CPU 
+ *         in: formData
+ *         required: false
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: GameID {12482373}
+ */
 app.post('/chess/NewGame', (req, res) => {
     const {
         PlayerID,
@@ -251,7 +357,30 @@ app.post('/chess/NewGame', (req, res) => {
     })
 });
 
-
+/**
+ * @swagger
+ * /user/login:
+ *   post: 
+ *       description: Login authentication
+ *       tags:
+ *           - User
+ *       parameters:
+ *       - name: username
+ *         description: Your login username
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: Your login password
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: loggedIn
+ *           '400':
+ *               description: passError         
+ */
 app.post('/user/login', (req, res)=> {
     const {username} = req.body;
     const {password} = req.body;
@@ -266,10 +395,29 @@ app.post('/user/login', (req, res)=> {
     });
 });
 
-//Find users games
+/**
+ * @swagger
+ * /user/{userid}/games:
+ *   get: 
+ *       description: Login authentication
+ *       tags:
+ *           - User
+ *       parameters:
+ *       - in: path
+ *         name: userid
+ *         schema:
+ *          type: string
+ *         required: true
+ *         description: ID of the user
+ *       responses:
+ *           '200':
+ *               description: {object}
+ *           '400':
+ *               description: error         
+ */
 app.get('/user/:userid/games', (req, res) => {
-    const { user } = req.params;
-    Game.find({ "Users": user }, (err, data) => {
+    const { userid } = req.params;
+    Game.find({ "Users": userid }, (err, data) => {
         err
         ? res.send(err)
         : res.send(data)
@@ -278,6 +426,30 @@ app.get('/user/:userid/games', (req, res) => {
 
 
 //Requests a new user. This checks the username against existing users
+/**
+ * @swagger
+ * /user/register:
+ *   post: 
+ *       description: Login authentication
+ *       tags:
+ *           - User
+ *       parameters:
+ *       - name: username
+ *         description: Your desired username
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: password
+ *         description: Your desired password
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: 
+ *           '400':
+ *               description: existUser        
+ */
 app.post('/user/register', (req,res)=> {
 
     const {username} = req.body;
