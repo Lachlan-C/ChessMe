@@ -6,6 +6,9 @@ import Header from './components/Header/Header'
 import Game from './components/Game/Game'
 import Registration from './components/Registration/Registration'
 import About from './components/About/About'
+import $ from 'jquery';
+import { handleChange } from './Helpers'
+
 
 import {
   BrowserRouter as Router,
@@ -13,41 +16,51 @@ import {
   Route,
 } from "react-router-dom";
 
-
-
 class App extends React.Component {
     constructor () {
         super()
         this.state = {
-          total: 0,
-          add: 0
+          username: "",
+          password: "",
+          loggedIn: localStorage.getItem('user') ? true : false,
         }
-        this.handleChange = this.handleChange.bind(this);
         this.handleClick = this.handleClick.bind(this)
+        this.onLogin = this.onLogin.bind(this)
+        this.handleChange = handleChange.bind(this)
+        this.handleLogout = this.handleLogout.bind(this)
     }
     
+    onLogin(){
+      $.post(`${process.env.REACT_APP_API_URL}/user/login`,{'username': this.state.username, 'password': this.state.password}).then(response => {
+          console.log(response)
+          if (response === 'userError') this.setState({response: "username does not exist", error: true});
+          else if(response === 'passError') this.setState({response: "password is incorrect", error: true});
+          else 
+          {
+              this.setState({loggedIn: true, error: false, response: ''});
+              localStorage.setItem('user', this.state.username)
+          }
+      });
+    }
+
+    //Handles logout
+    handleLogout() { 
+    this.setState({loggedIn: false})
+    localStorage.removeItem('user')
+    }
+
     
     handleClick() {
       this.setState((prevState => ({
         total: prevState.total + + prevState.add
       })))
     }
-  
-    handleChange(event) {
-      const { name, value } = event.target;
-      if (value.match("^[0-9]+$|$^"))
-      {
-        this.setState({ 
-          [name]: value
-        })
-      }
-    }
       
     render()
     {
         return (
             <Router>
-              <Header />
+              <Header loggedIn={this.state.loggedIn} handleClick={this.handleLogout}/>
               <Switch>
                 <Route path="/game-history">
                   <GameHistory/>
@@ -56,7 +69,14 @@ class App extends React.Component {
                   <Registration/>
                 </Route>
                 <Route path="/login">
-                  <Login/>
+                  <Login 
+                  handleClick={this.onLogin} 
+                  message={this.state.response} 
+                  error={this.state.error} 
+                  handleChange={this.handleChange} 
+                  username={this.state.username} 
+                  password={this.state.password}
+                  />
                 </Route>
                 <Route path="/create-game">
                   <CreateGame/>
