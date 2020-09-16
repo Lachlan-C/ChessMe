@@ -83,6 +83,43 @@ function toFEN(movesArray, FEN)
 
 
 
+/**
+ * @swagger
+ * /game/{gameid}/fen:
+ *   get: 
+ *       description: Get all the fens for the game
+ *       tags:
+ *           - Game
+ *       parameters:
+ *       - in: path
+ *         name: gameid
+ *         schema:
+ *          type: string
+ *         required: true
+ *         description: ID of the game
+ *       responses:
+ *           '200':
+ *               description: {object}
+ *           '400':
+ *               description: error         
+ */
+app.get('/game/:gameid/fen', (req, res) => {
+    const { gameid } = req.params;
+    Game.find({ "GameID": gameid }, (err, data) => {
+        let FENarray = []
+        let FEN = ""
+        if (err)
+            res.send(err)
+        else{
+            console.log(data[0].Moves)
+            data[0].Moves.map((item) => {
+                FEN = toFEN([item], FEN)
+                FENarray.push(FEN)
+            })
+            res.send({FENs:FENarray, Moves: data[0].Moves})
+        }
+    })
+})
 
 /**
  * @swagger
