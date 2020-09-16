@@ -417,6 +417,36 @@ app.get('/user/:userid/games', (req, res) => {
     })
 })
 
+/**
+ * @swagger
+ * /user/{username}:
+ *   get: 
+ *       description: Find user w/ username
+ *       tags:
+ *           - User
+ *       parameters:
+ *       - in: path
+ *         name: username
+ *         schema:
+ *          type: string
+ *         required: true
+ *         description: username
+ *       responses:
+ *           '200':
+ *               description: {object}
+ *           '400':
+ *               description: error         
+ */
+app.get('/user/:username', (req, res) => {
+    const { username } = req.params;
+    User.find({ "username": username }, (err, data) => {
+        err
+        ? res.send(err)
+        : res.send(data)
+    })
+})
+
+
 
 //Requests a new user. This checks the username against existing users
 /**
