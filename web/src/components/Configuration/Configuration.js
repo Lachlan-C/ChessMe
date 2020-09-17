@@ -1,14 +1,36 @@
 import React from 'react';
+import { handleChange } from '../../Helpers'
+import $ from 'jquery'
 
 class Configuration extends React.Component {
     constructor()
     {
         super()
         this.state = {
-            userID: '124949129'
+            userID: '',
+            boardID: ''
         }
-        
+
+        this.handleChange = handleChange.bind(this)
+        this.handleClick = this.handleClick.bind(this)
     }
+
+    componentDidMount() {  
+        //maybe check if the user is logged in first?
+        $.get(`${process.env.REACT_APP_API_URL}/user/${localStorage.getItem('user')}`).then(user => {
+            this.setState({userID: user[0].userID})
+        })
+    }
+
+    handleClick()
+    {
+        $.post(`${process.env.REACT_APP_MQTT_URL}/board/pair`,{'boardID': this.state.boardID, 'userID': this.state.userID}).then(response => {
+            console.log(`Pairing response: ${response}`)
+        });
+    }
+
+    
+
     render()
     {
         return (
