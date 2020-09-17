@@ -2,9 +2,10 @@ const mqtt = require('mqtt');
 const express = require('express');
 const bodyParser = require('body-parser');
 const jquery = require('jquery');
+const { basename } = require('path');
 
 var connected = false;
-var GameID, userID;
+var GameID, userID, team, sendMessage;
 const boardID = 1234;
 
 const app = express();
@@ -30,36 +31,47 @@ client.on('connect', () => {
     client.subscribe(`${mqtt_base_path}/#`, err => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
-    client.publish(`${mqtt_base_path}/board/1234`, JSON.stringify({"userID":"12345678","request":"pair"}));
+    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"12345678","request":"pair"}));
 });
 
 client.on('message', (topic, message) => {
+    //prints initial message.
     console.log(`message: ${message}`);
+    //splits topic by / character.
     topic = topic.slice(1).split('/');
+    //checks topic[2] exists.
     if(topic[2]){
+        //parses message to a JSON object
         const mes = JSON.parse(message);
+        //Checks topic = 'board'
         if (topic[2].match(`board`)){
-            if((topic[3] == boardID)&&(mes.request == 'pair')) {
-                userID = mes.userID;
-                console.log('Paired');
+            //Checks boardID is valid.
+            if(topic[3] == boardID) {
+                if(mes.request === 'pair') {
+                    userID = mes.userID;
+                    console.log('Paired');
+                }else if(mes.request === 'connect') {
+                    GameID = mes.GameID;
+                    team = mes.team;
+                    connected = true;
+                }
             }
-        }else if(connected == false) {
-            return;
-        }else if(mes.request === 'newGame') {
-            //newGame code
-        }else if(mes.request === 'hint') {
-            //hint code
-        }else if(mes.request === 'validate') {
-            //validate moves code
-        }else if(mes.request=== 'piecemoves') {
-            //piecemoves code
+        }else if (topic[2].match('test')) {
+            console.log("attempting Get");
+            sendMessage = mes;
         }
     }
 });
 
+app.post('/newMove', (req,res)=> {
+    client.publish(`${mqtt_base_path}/game/${gameid}`, JSON.stringify(/* body of request here.*/))
+});
 
-
-
+app.post('/testSend', (req,res)=>{
+    console.log("request: ",req.body);
+    client.publish(`${mqtt_base_path}/test`, JSON.stringify(`{Name: ${req.body.Name}}`));
+    setTimeout(()=>{res.send(sendMessage)},1000);
+});
 
 
 //display chessboard.html
@@ -67,12 +79,7 @@ app.get('/', (req,res)=>{
     res.sendFile(`${__dirname}/public/Chessboard.html`);
 })
 
-
-
-
-
-
 //Listening on port 3000
-app.listen(3000, () => {
-    console.log('listening on port 3000');
+app.listen(3001, () => {
+    console.log('listening on port 3001');
 });
