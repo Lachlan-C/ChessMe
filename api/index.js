@@ -28,6 +28,7 @@ mongoose.connect(MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true});
 const User = require(`./models/user`);
 const Game = require(`./models/game`);
 const { json } = require('express');
+const user = require('./models/user');
 
 app.use(express.static('public'));
 app.use((req,res,next)=> {
@@ -118,6 +119,40 @@ app.get('/game/:gameid/fen', (req, res) => {
             })
             res.send({FENs:FENarray, Moves: data[0].Moves})
         }
+    })
+})
+
+
+/**
+ * @swagger
+ * /user/board/pair:
+ *   post: 
+ *       description: Update board ID on DB
+ *       tags:
+ *           - StockFish
+ *       parameters:
+ *       - name: boardID
+ *         description: ID of the board
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: userID
+ *         description: ID of the user
+ *         in: formData
+ *         required: true
+ *         type: int
+ *       responses:
+ *           '200':
+ *               description: {object}
+ */
+app.post('/user/board/pair', (req,res) => {     
+    const {boardID, userID} = req.body
+    User.find({userID: userID}, (err, data) => {
+        data[0].boardID = boardID
+        
+        data[0].save((err => {
+            err ? res.send(err) : res.send(data)
+        }))            
     })
 })
 
