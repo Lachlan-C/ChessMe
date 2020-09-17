@@ -16,8 +16,8 @@ class Header extends React.Component {
             <div className="collapse navbar-collapse" id="navbarSupportedContent">
                 <Link className="nav-item nav-link" to="/game-history">Game History</Link>
                 <Link className="nav-item nav-link" to="/create-game">Create Game</Link>
-                <Link className="nav-item nav-link" to="/login" onClick={this.props.handleClick}>{this.props.loggedIn ? "Logout" : "Login"}</Link>
                 <Link className="nav-item nav-link" to="/configuration">Configuration</Link>
+                <Link className="nav-item nav-link" to="/login" onClick={this.props.handleClick}>{this.props.loggedIn ? "Logout" : "Login"}</Link>
                 <Link className="nav-item nav-link" to="/About">About</Link>
             </div>
         </nav>
