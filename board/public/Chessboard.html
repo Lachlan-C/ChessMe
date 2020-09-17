@@ -7,6 +7,7 @@
   </head>
   <body>
     <p>This is a mock chess board</p>
+    <div id="gameid"></div>
     <div id="myBoard" style="width: 400px">
     <div class="chessboard-63f37">
         <div class="board-b72b1" style="width: 392px;">
@@ -152,12 +153,14 @@
         </div>
     </div>
     </div>
+    <!--
     <label>Status:</label>
     <div id="status">White to move</div>
     <label>FEN:</label>
     <div id="fen">rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1</div>
     <label>PGN:</label>
     <div id="pgn"></div>
+    -->
 
     <!--<button type="button" id="testing">Click here</button>-->
     <!--- End Example HTML -------------------------------------------------------->
@@ -171,6 +174,7 @@
     // https://github.com/jhlywa/chess.js
     
     var board = null
+    var startFEN;
     var game = new Chess()
     var $status = $('#status')
     var $fen = $('#fen')
@@ -208,13 +212,14 @@
       }
       */
       $.post('/newMove', {"Move":`${source}${target}`}).then(response => {
-        game.position(response);
+        console.log(response);
+        board.position(response);
       })
 
       //send this request to the mqtt API:
       // { FEN: game.fen(), from: target, to: source}
     
-      updateStatus()
+      //updateStatus()
     }
 
     // update the board position after the piece snap
@@ -223,7 +228,16 @@
       board.position(game.fen())
     }
 
+    //Updates the board whenever a new FEN string is received.
+    var update = setInterval(find, 1000);
+    function find () {
+      $.get('/loadGame').then(response=>{
+        board.position(response);
+      });
+    }
+
     function updateStatus () {
+
       var status = ''
     
       var moveColor = 'White'
@@ -261,7 +275,7 @@
       position: 'start',
       onDragStart: false,
       onDrop: onDrop,
-      onSnapEnd: false
+      onSnapEnd: false,
     }
     board = Chessboard('myBoard', config)
 

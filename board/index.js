@@ -26,13 +26,12 @@ app.use(bodyParser.urlencoded({
 const client = mqtt.connect("mqtt://broker.hivemq.com:1883");
 
 client.on('connect', () => {
-    connected = true;
     console.log('Connected'); //Can access the mqtt broker.
     client.subscribe(`${mqtt_base_path}/#`, err => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
-    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"12345678","request":"pair"}));
-    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"12345666","request":"connect","team":"white"}));
+    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"00000001","request":"pair"}));
+    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"24870463","request":"connect","team":"white","FEN":"rnbqkbnr/pppp1ppp/4p3/8/8/4PN2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"}));
 });
 
 client.on('message', (topic, message) => {
@@ -52,10 +51,13 @@ client.on('message', (topic, message) => {
                     userID = mes.userID;
                     console.log('Paired');
                 }else if(mes.request === 'connect') {
-                    gameID = mes.gameID;
+                    if(connected === false) {
+                        gameID = mes.gameID;
                     team = mes.team;
+                    FEN = mes.FEN;
                     connected = true;
-                    console.log('Connected');
+                    console.log('Connected to game');
+                    }else console.log("Already Connected");
                 }
             }
         }else if (topic[2].match('game')) {
@@ -71,6 +73,10 @@ client.on('message', (topic, message) => {
             sendMessage = mes;
         }
     }
+});
+
+app.get('/loadGame', (req,res)=>{
+    res.send(FEN);
 });
 
 app.post('/newMove', (req,res)=> {
