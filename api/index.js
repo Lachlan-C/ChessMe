@@ -153,7 +153,9 @@ function send(str)
 
 
 app.post('/stockfish/move', (req,res) => {
-const { FEN } = req.body 
+const { FEN, difficulty } = req.body 
+if (difficulty)
+    send(`setoption name Skill Level value ${difficulty}`)
 send(`position fen ${FEN}`)
 send('go')
 
@@ -164,7 +166,8 @@ engine.onmessage = (data) => {
         //Finds the FEN string
         if (move)
         {
-            res.send(toFEN([move[1]], FEN))
+            //res.send(toFEN([move[1]], FEN))
+            res.send(move[1])
         }
 }
 })
