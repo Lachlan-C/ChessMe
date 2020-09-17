@@ -31,11 +31,12 @@ client.on('connect', () => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
     client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"00000001","request":"pair"}));
-    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"24870463","request":"connect","team":"white","FEN":"rnbqkbnr/pppp1ppp/4p3/8/8/4PN2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"}));
+    //client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"16236484","request":"connect","team":"white","FEN":"rnbqkbnr/pppp1ppp/4p3/8/8/4PN2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"}));
 });
 
 client.on('message', (topic, message) => {
     //prints initial message.
+    console.log(`topic: ${topic}`);
     console.log(`message: ${message}`);
     //splits topic by / character.
     topic = topic.slice(1).split('/');
@@ -51,13 +52,11 @@ client.on('message', (topic, message) => {
                     userID = mes.userID;
                     console.log('Paired');
                 }else if(mes.request === 'connect') {
-                    if(connected === false) {
-                        gameID = mes.gameID;
+                    gameID = mes.gameID;
                     team = mes.team;
                     FEN = mes.FEN;
                     connected = true;
                     console.log('Connected to game');
-                    }else console.log("Already Connected");
                 }
             }
         }else if (topic[2].match('game')) {
@@ -80,6 +79,9 @@ app.get('/loadGame', (req,res)=>{
 });
 
 app.post('/newMove', (req,res)=> {
+    if(gameID === undefined) {
+        return;
+    }
     const moveSend = {
         UserID: `${userID}`,
         move: `${req.body.Move}`,
