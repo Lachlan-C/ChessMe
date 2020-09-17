@@ -43,7 +43,7 @@ client.on('connect', () => {
 //Sends game topic to board
 app.post('/game/connect', (req, res) => {
     //array of userid & boardid
-    const { userID, boardID, gameID } = req.body
+    const { userID, boardID, gameID, FEN } = req.body
     //user0 is white because white goes first
     //user1 is BLACK because black goes second
     if (userID[0])
@@ -52,7 +52,8 @@ app.post('/game/connect', (req, res) => {
             {
                 gameID: gameID,
                 request: 'connect',
-                team: 'white'
+                team: 'white',
+                FEN: FEN
             }
             ))
     }
@@ -62,7 +63,8 @@ app.post('/game/connect', (req, res) => {
             {
                 gameID: gameID,
                 request: 'connect',
-                team: 'black'
+                team: 'black',
+                FEN: FEN
             }
             ))
     }
@@ -104,8 +106,10 @@ function validate(body)
             console.log(json)
             //expected response {move: 'e2e3', status: 'white turn', userID: ['xxx', 'yyy']}
             //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
-
-            //send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
+            
+            json.server = true
+            json.request = 'validate'
+            send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
 
             //get gameID from body.gameID
             //here send message back to game channel w/ both user identifiers if valid move
@@ -156,10 +160,22 @@ function hint(body)
 
 client.on('message', (topic, message) => {
     topic = topic.slice(1).split('/')
-    if (topic[2])
+
+    let messageJSON
+    try {
+        messageJSON = JSON.parse(message)
+    } catch (e) {
+        return
+    }
+
+    if(messageJSON.server)
+    {
+        return
+    }
+    else if (topic[2])
     {
         //Topic /AkdsmDm2sn/chessme/game/:gameid
-        const messageJSON = JSON.parse(message)
+
         if (topic[2].match(`game`))
         {
             messageJSON.GameID = topic[3]
