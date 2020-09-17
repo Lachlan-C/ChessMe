@@ -5,6 +5,7 @@ var stockfish = require('stockfish');
 const swaggerOptions = require('./swagger-options');
 const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
+const fetch = require('node-fetch')
 
 const { Chess } = require('chess.js');
 var chessGame = new Chess();
@@ -20,7 +21,7 @@ const bodyParser = require('body-parser');
 
 dotenv.config();
 
-const { MONGO_URL, PORT } = process.env;
+const { MONGO_URL, PORT, MQTT_URL } = process.env;
 const app = express();
 
 mongoose.connect(MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true});
@@ -418,7 +419,6 @@ app.post('/chess/NewGame', (req, res) => {
         PlayerID,
         EnemyID
     } = req.body;
-    var newGameID;
     Game.findOne({
         "Users": PlayerID,
         "Winner": ""
@@ -428,17 +428,41 @@ app.post('/chess/NewGame', (req, res) => {
         {
             return res.send("ERROR GAME ALREADY RUNNING");
         } 
+
         else 
         {
-            newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();
-            var CurrentDate = new Date();
+            const newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();  
+            const FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            const Users = [PlayerID, EnemyID]
+            const CurrentDate = new Date();
+
+
+            User.find({'userID': Users}, (err, user) => {
+                const boardID = [user[0].boardID, user[1].boardID]
+                
+                const body = {
+                    gameID: newGameID,
+                    boardID: boardID,
+                    userID: Users,
+                    FEN: FEN
+                }
+
+                fetch(`${MQTT_URL}/game/connect`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+                .then(response => response.text())
+                .then(response => 
+                    {
+                        console.log(response)
+                    })
+
             new Game({
                 GameID: newGameID,
                 DateTimeStart: CurrentDate,
-                Users: [PlayerID, EnemyID],
-                CurrentFen: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+                Users: Users,
+                CurrentFen: FEN
             }).save();
+            
             res.send(newGameID);
+        })
         }
     })
 });
