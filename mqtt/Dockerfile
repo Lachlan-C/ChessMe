@@ -1,5 +1,5 @@
-#docker build -t chessmeMQTT .
-#docker run -it -p 5001:5001 chessmeMQTT
+#docker build -t chessmemqtt .
+#docker run -it -p 5001:5001 chessmemqtt
 
 FROM node:12
 
@@ -12,4 +12,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 5001
+
 CMD [ "npm", "start" ]

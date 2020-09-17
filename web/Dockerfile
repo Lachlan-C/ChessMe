@@ -1,5 +1,5 @@
-#docker build -t chessmeWeb .
-#docker run -it -p 3000:3000 chessmeWeb
+#docker build -t chessmeweb .
+#docker run -it -p 3000:3000 chessmeweb
 
 FROM node:12
 

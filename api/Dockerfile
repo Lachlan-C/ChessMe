@@ -1,5 +1,5 @@
-#docker build -t chessmeBoard .
-#docker run -it -p 80:3000 chessmeBoard
+#docker build -t chessmeapi .
+#docker run -it -p 5000:5000 chessmeapi
 
 FROM node:12
 
@@ -12,4 +12,5 @@ RUN npm install
 COPY . .
 
 EXPOSE 5000
+
 CMD [ "npm", "start" ]
