@@ -21,11 +21,11 @@ class About extends React.Component {
             We wanted to create a webapp to play against Stockfish, but further, we wanted to be able to play against stockfish with a physical board, using our solution to communicate with Stockfish<br></br>
             Here, ChessMe was born. We are currently in development, developing the Webservice and background systems to be able to create a physical board in the future.<br></br>
             <br></br>
-            <u1>
+            <ul>
                 <li>Shaine Christmas: Software Engineering Student at Deakin</li>
                 <li>Riley Dellios: Software Engineering Student at Deakin</li>
                 <li>Lachlan Cayzer: Software Engineering Student at Deakin</li>
-            </u1>
+            </ul>
             </p>
         </div>
         )
