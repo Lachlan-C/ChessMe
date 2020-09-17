@@ -306,9 +306,27 @@ app.post('/validate/move', (req, res) => {
 
         //Creates new Game
         chessGame = new Chess(data.CurrentFen);
+        
+        //check to see if Correct user is making the move
+        var valid = false; 
+        
+        if (chessGame.turn() === 'b')
+        { 
+            if (data.Users[1] === UserID)
+            {
+                //Updates the Game with the Move/Validates
+                valid = onDrop(move)
+            }
+        }
+        if (chessGame.turn() === 'w')
+        {   
+            if (data.Users[0] === UserID)
+            {
+                //Updates the Game with the Move/Validates
+                valid = onDrop(move)
+            }
+        }
 
-        //Updates the Game with the Move/Validates
-        const valid = onDrop(move)
         //Status Check (has someone won?)
         const status = updateStatus()
         res.send({
