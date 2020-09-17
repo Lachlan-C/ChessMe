@@ -38,15 +38,25 @@ client.on('connect', () => {
 });
 
 
-//Sends a message to pair the board the user
-app.put('/board/pair', (req, res) => {
-
-})
 
 //Sends game topic to board
 app.put('/game/connect', (req, res) => {
 
 })
+
+
+//Subject to change maybe add a dynamic response?
+app.post('/board/pair', (req, res) => {
+    const { userID, boardID } = req.body 
+    const request = {
+        userID: userID,
+        request: 'pair'
+    }
+    send(`/AkdsmDm2sn/chessme/board/${boardID}`, JSON.stringify(request))
+    res.send('message has been sent!')
+})
+
+
 
 //Publish message to topic
 function send(topic, msg)
