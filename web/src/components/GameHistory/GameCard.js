@@ -9,6 +9,12 @@ class GameCard extends React.Component {
         this.state = {
             isOpen: false
         }
+        this.handleClick = this.handleClick.bind(this)
+    }
+
+    handleClick() 
+    {
+        this.setState(prevState => ({isOpen: !prevState.isOpen}))
     }
 
     render()
@@ -16,7 +22,7 @@ class GameCard extends React.Component {
         return (
             <div className="card">
                 <div className="card-body">
-                    <button onClick={() => this.setState(prevState => ({isOpen: !prevState.isOpen}))} className="btn btn-outline-dark">{this.props.status} {this.props.date}</button>
+                    <button onClick={this.handleClick} className="btn btn-outline-dark">{this.props.status} {this.props.date}</button>
                     {this.state.isOpen ? <Game gameID={this.props.gameID}/> : ''}
                 </div>
             </div>

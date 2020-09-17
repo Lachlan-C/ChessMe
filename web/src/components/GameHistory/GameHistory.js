@@ -2,7 +2,7 @@ import React from 'react';
 import Games from './Games'
 
 class App extends React.Component {
-      
+
     render()
     {
         return (
