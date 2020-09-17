@@ -1,19 +1,16 @@
-#docker build -t chessme .
-#docker run -it -p 3000:3000 chessme
+#docker build -t chessmeWeb .
+#docker run -it -p 3000:3000 chessmeWeb
 
-
-FROM node:alpine
-
+FROM node:12
 
 WORKDIR /web
-#ENV PATH /web/.env
 
-COPY package.json ./
-COPY package-lock.json ./
+COPY package*.json ./
+
 RUN npm install
 
-COPY . ./
+COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+CMD [ "npm", "start" ]
