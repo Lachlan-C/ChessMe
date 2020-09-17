@@ -6,6 +6,7 @@ import Header from './components/Header/Header'
 import Game from './components/Game/Game'
 import Registration from './components/Registration/Registration'
 import About from './components/About/About'
+import Configuration from './components/Configuration/Configuration'
 import $ from 'jquery';
 import { handleChange } from './Helpers'
 
@@ -83,6 +84,9 @@ class App extends React.Component {
                 </Route>
                 <Route path="/About">
                   <About/>
+                </Route>
+                <Route path="/configuration">
+                  <Configuration/>
                 </Route>
                 <Route path="/">
                   <Game />
