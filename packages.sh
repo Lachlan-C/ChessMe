@@ -11,3 +11,6 @@ cd ..
 cd web
 npm install
 cd ..
+cd testing
+npm install
+cd ..
