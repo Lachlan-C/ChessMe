@@ -5,7 +5,7 @@ const jquery = require('jquery');
 const { basename } = require('path');
 
 var connected = false;
-var GameID, userID, team, sendMessage;
+var gameID, userID, team, sendMessage, FEN;
 const boardID = 1234;
 
 const app = express();
@@ -32,6 +32,7 @@ client.on('connect', () => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
     client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"12345678","request":"pair"}));
+    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"12345666","request":"connect","team":"white"}));
 });
 
 client.on('message', (topic, message) => {
@@ -51,12 +52,21 @@ client.on('message', (topic, message) => {
                     userID = mes.userID;
                     console.log('Paired');
                 }else if(mes.request === 'connect') {
-                    GameID = mes.GameID;
+                    gameID = mes.gameID;
                     team = mes.team;
                     connected = true;
+                    console.log('Connected');
+                }
+            }
+        }else if (topic[2].match('game')) {
+            if (topic[3] === gameID){
+                if(mes.request === 'validate'){
+                    FEN = mes.FEN
+                    console.log(FEN);
                 }
             }
         }else if (topic[2].match('test')) {
+            //This tests the connection with the board.
             console.log("attempting Get");
             sendMessage = mes;
         }
@@ -64,15 +74,21 @@ client.on('message', (topic, message) => {
 });
 
 app.post('/newMove', (req,res)=> {
-    client.publish(`${mqtt_base_path}/game/${gameid}`, JSON.stringify(/* body of request here.*/))
+    const moveSend = {
+        UserID: `${userID}`,
+        move: `${req.body.Move}`,
+        request: 'validate'
+    }
+    client.publish(`${mqtt_base_path}/game/${gameID}`, JSON.stringify(moveSend));
+    setTimeout(()=>{res.send(FEN)},1000);
 });
 
+//Testing connection with test button
 app.post('/testSend', (req,res)=>{
     console.log("request: ",req.body);
     client.publish(`${mqtt_base_path}/test`, JSON.stringify(`{Name: ${req.body.Name}}`));
     setTimeout(()=>{res.send(sendMessage)},1000);
 });
-
 
 //display chessboard.html
 app.get('/', (req,res)=>{
