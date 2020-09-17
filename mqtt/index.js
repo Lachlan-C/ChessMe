@@ -13,6 +13,7 @@ const app = express();
 
 const { json } = require('body-parser');
 const { response } = require('express');
+const { connect } = require('mqtt');
 
 app.use(express.static('public'));
 app.use((req,res,next)=> {
@@ -40,8 +41,32 @@ client.on('connect', () => {
 
 
 //Sends game topic to board
-app.put('/game/connect', (req, res) => {
-
+app.post('/game/connect', (req, res) => {
+    //array of userid & boardid
+    const { userID, boardID, gameID } = req.body
+    //user0 is white because white goes first
+    //user1 is BLACK because black goes second
+    if (userID[0])
+    {
+        send(`/AkdsmDm2sn/chessme/board/${boardID[0]}`, JSON.stringify(
+            {
+                gameID: gameID,
+                request: 'connect',
+                team: 'white'
+            }
+            ))
+    }
+    if (userID[1])
+    {
+        send(`/AkdsmDm2sn/chessme/board/${boardID[1]}`, JSON.stringify(
+            {
+                gameID: gameID,
+                request: 'connect',
+                team: 'black'
+            }
+            ))
+    }
+    res.send('message has been sent!')
 })
 
 

@@ -129,7 +129,7 @@ app.get('/game/:gameid/fen', (req, res) => {
  *   post: 
  *       description: Update board ID on DB
  *       tags:
- *           - StockFish
+ *           - User
  *       parameters:
  *       - name: boardID
  *         description: ID of the board
