@@ -467,6 +467,72 @@ app.post('/chess/NewGame', (req, res) => {
     })
 });
 
+
+
+app.post('/chess/reconnect', (req, res) => {
+    const {username, gameID } = req.body
+    let team
+    let Users = []
+    let BoardID = []
+    User.find({'username': username}, (err, user) => {
+        //console.log(user)
+        console.log(user[0].userID)
+        if (!user[0].boardID)
+        {
+            res.send('Fatal ERROR, Please Pair with a board')
+            return
+        }
+        
+        Game.find({ "GameID": gameID }, (err, data) => {
+            console.log(data)
+            const userID = user[0].userID
+            const boardID = user[0].boardID
+
+            if (data[0].Users[0].userID === user[0].userID)
+            {
+                Users[0] = user[0].userID
+                Users[1] = undefined
+                BoardID[0] = user[0].boardID
+                BoardID[0] = null
+            }
+            else
+            {
+                Users[0] = null
+                Users[1] = user[0].userID
+                BoardID[0] = null
+                BoardID[1] = user[0].boardID
+                
+            }
+                 
+            const body = {
+                boardID: boardID,
+                userID: userID,
+            }
+            fetch(`${MQTT_URL}/board/pair`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+            .then(response => response.text())
+            .then(response => 
+                {
+                    console.log(response)
+                            const body = {
+                                gameID: data[0].GameID,
+                                boardID: BoardID,
+                                userID: Users,
+                                FEN: data[0].CurrentFen,
+                                moves: data[0].Moves
+                            }
+                           
+                            fetch(`${MQTT_URL}/game/connect`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+                            .then(response => response.text())
+                            .then(response => 
+                                {
+                                    console.log(response)
+                                })
+                        })
+                        res.send('success')
+            })
+        })
+})
+
 /**
  * @swagger
  * /user/login:
