@@ -4,11 +4,12 @@ const bodyParser = require('body-parser');
 const jquery = require('jquery');
 const { basename } = require('path');
 
-var connected = false;
-var gameID, userID, team, sendMessage, FEN;
-const boardID = 1234;
+var gameID, team, sendMessage, FEN;
+const boardID = 2222;//1111
 
 const app = express();
+
+var userID = app.locals.USER_ID;
 
 const mqtt_base_path= '/AkdsmDm2sn/chessme'
 
@@ -30,7 +31,7 @@ client.on('connect', () => {
     client.subscribe(`${mqtt_base_path}/#`, err => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
-    client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"00000001","request":"pair"}));
+    //client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"00000001","request":"pair","server":"true"}));
     //client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"gameID":"16236484","request":"connect","team":"white","FEN":"rnbqkbnr/pppp1ppp/4p3/8/8/4PN2/PPPP1PPP/RNBQKB1R b KQkq - 1 2"}));
 });
 
@@ -49,8 +50,12 @@ client.on('message', (topic, message) => {
             //Checks boardID is valid.
             if(topic[3] == boardID) {
                 if(mes.request === 'pair') {
-                    userID = mes.userID;
-                    console.log('Paired');
+                    if (mes.server) {
+                        userID = mes.userID;
+                        app.locals.USER_ID = userID
+                        client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":`${userID}`,"request":"pair"}));
+                        console.log('Paired');
+                    }
                 }else if(mes.request === 'connect') {
                     gameID = mes.gameID;
                     team = mes.team;
@@ -76,10 +81,12 @@ client.on('message', (topic, message) => {
 
 app.get('/loadGame', (req,res)=>{
     res.send(FEN);
+    app.locals.USER_ID = userID;
 });
 
 app.post('/newMove', (req,res)=> {
     if(gameID === undefined) {
+        res.send("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
         return;
     }
     const moveSend = {
