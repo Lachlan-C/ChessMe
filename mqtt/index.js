@@ -7,7 +7,7 @@ const fetch = require('node-fetch')
 dotenv.config();
 
 
-const { PORT, BROKER, MQTT_PATH } = process.env;
+const { PORT, BROKER, MQTT_PATH, API_URL } = process.env;
 
 const app = express();
 
@@ -53,7 +53,8 @@ app.post('/game/connect', (req, res) => {
                 gameID: gameID,
                 request: 'connect',
                 team: 'white',
-                FEN: FEN
+                FEN: FEN,
+                server: true
             }
             ))
     }
@@ -64,7 +65,8 @@ app.post('/game/connect', (req, res) => {
                 gameID: gameID,
                 request: 'connect',
                 team: 'black',
-                FEN: FEN
+                FEN: FEN,
+                server: true
             }
             ))
     }
@@ -77,7 +79,8 @@ app.post('/board/pair', (req, res) => {
     const { userID, boardID } = req.body 
     const request = {
         userID: userID,
-        request: 'pair'
+        request: 'pair',
+        server: true
     }
     send(`/AkdsmDm2sn/chessme/board/${boardID}`, JSON.stringify(request))
     res.send('message has been sent!')
@@ -98,7 +101,7 @@ function validate(body)
 {
     //atm it needs to, from
     //Will need userID in future to validate which user the message is coming from
-    fetch('http://localhost:5000/validate/move', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+    fetch(`${API_URL}/validate/move`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
     .then(response => response.json())
     .then(json => 
         {
@@ -120,7 +123,7 @@ function validate(body)
 function pieceMoves(body)
 {
         //atm it needs GameID, piecePos
-        fetch('http://localhost:5000/chess/moves', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+        fetch(`${API_URL}/chess/moves`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
         .then(response => response.json())
         .then(json => 
             {
@@ -141,7 +144,7 @@ function pieceMoves(body)
 function hint(body)
 {
     //atm it needs FEN
-    fetch('http://localhost:5000/stockfish/move', { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+    fetch(`${API_URL}stockfish/move`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
     .then(response => response.json())
     .then(json => 
         {
@@ -155,6 +158,18 @@ function hint(body)
             //get gameID from body.gameID
             //here send message back to game channel with user identifier
         })
+}
+
+//Updates the DB with the Board ID
+function pair(body)
+{
+    //takes boardID and userID
+    fetch(`${API_URL}/user/board/pair`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+    .then(response => response.json())
+    .then(json => 
+    {
+        console.log(json)   
+    })
 }
 
 
@@ -214,6 +229,8 @@ client.on('message', (topic, message) => {
         else if (topic[2].match('board'))
         {
             messageJSON.boardID = topic[3]
+            if (messageJSON.request === 'pair')
+                pair(messageJSON)
             //Topic /AkdsmDm2sn/chessme/board/:boardid
             /*
             {
