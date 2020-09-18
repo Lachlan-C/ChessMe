@@ -24,6 +24,7 @@ class Game extends React.Component {
         this.stepBack = this.stepBack.bind(this)
         this.handleRecommend = this.handleRecommend.bind(this)
         this.handleChange = handleChange20.bind(this)
+        this.handleReConPlay = this.handleReConPlay.bind(this)
     }
     
 
@@ -75,6 +76,20 @@ class Game extends React.Component {
         });
     }
 
+    handleReConPlay()
+    {
+        if (!this.props.status)
+        {
+
+            //sends the reconnect request
+            $.post(`${process.env.REACT_APP_API_URL}/chess/reconnect`, {"gameID": this.props.gameID, "username": localStorage.getItem('user')}).then(response => {
+                window.alert(response);
+            })
+        }
+        else
+            return
+    }
+
     render()
     {
 
@@ -96,7 +111,7 @@ class Game extends React.Component {
                         <input value={this.state.difficulty} type="text" placeholder="difficulty" name="difficulty" onChange={this.handleChange}></input>
                 </div>
                     <GameController stepForward={this.stepForward} stepBack={this.stepBack}/>
-                    <button className="btn btn-success">Replay</button>
+                    <button className="btn btn-success" onClick={this.handleReConPlay}>{this.props.status ? "Replay" : "Reconnect"}</button>
             </div>  
         )
     }   

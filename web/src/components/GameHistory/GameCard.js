@@ -23,7 +23,7 @@ class GameCard extends React.Component {
             <div className="card">
                 <div className="card-body">
                     <button onClick={this.handleClick} className="btn btn-outline-dark">{this.props.status} {this.props.date}</button>
-                    {this.state.isOpen ? <Game gameID={this.props.gameID}/> : ''}
+                    {this.state.isOpen ? <Game gameID={this.props.gameID} status={this.props.status}/> : ''}
                 </div>
             </div>
         )
