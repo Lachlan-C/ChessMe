@@ -18,7 +18,8 @@ class Game extends React.Component {
             index: 0,
             position: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR',
             undo: true,
-            difficulty: undefined
+            difficulty: undefined,
+            squareStyles: {}
         }
         this.stepForward = this.stepForward.bind(this)
         this.stepBack = this.stepBack.bind(this)
@@ -38,7 +39,8 @@ class Game extends React.Component {
         {
             this.setState(prevState => ({
                 position: this.state.FENs[this.state.index + 1],
-                index: prevState.index + 1
+                index: prevState.index + 1,
+                squareStyles: {}
             })
             )
         }
@@ -72,7 +74,12 @@ class Game extends React.Component {
         console.log(this.state.difficulty)
 
         $.post(`${process.env.REACT_APP_API_URL}/stockfish/move`,{'difficulty': this.state.difficulty, 'FEN': this.state.FENs[this.state.index]}).then(response => {
-            console.log(response)
+            const squareStyles = {};
+            squareStyles[response.substr(0,2)] = {backgroundColor: 'teal'}
+            squareStyles[response.substr(2,4)] = {backgroundColor: 'teal'}
+            this.setState({
+                squareStyles: squareStyles
+            })  
         });
     }
 
@@ -100,7 +107,9 @@ class Game extends React.Component {
                     id="random"
                     undo={this.state.undo}
                     onPieceClick={this.onDragStart}
-                    onDrop={this.onDrop}/>
+                    onDrop={this.onDrop}
+                    squareStyles={this.state.squareStyles}
+                    />
 
                 {/* <WithMoveValidation/> */}
 
