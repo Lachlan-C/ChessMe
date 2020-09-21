@@ -141,7 +141,7 @@ app.get('/game/:gameid/fen', (req, res) => {
  *         description: ID of the user
  *         in: formData
  *         required: true
- *         type: int
+ *         type: string
  *       responses:
  *           '200':
  *               description: {object}
@@ -177,7 +177,7 @@ app.post('/user/board/pair', (req,res) => {
  *         type: int
  *       responses:
  *           '200':
- *               description: {FEN: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'}
+ *               description: 'e2e3'
  */
 //StockFISH ---------------------------------------
 var engine = stockfish();
@@ -271,20 +271,15 @@ function onDrop (move) {
  *         in: formData
  *         required: true
  *         type: string
- *       - name: to
- *         description: Start coordinate of the piece you are moving   
- *         in: formData
- *         required: true
- *         type: string
- *       - name: from
- *         description: Destination coordinate of the piece you are moving  
+ *       - name: move
+ *         description: Start and Dest Coordinate of the piece you are moving 
  *         in: formData
  *         required: true
  *         type: string
  *       - name: UserID
  *         description: ID of the user sending the move
  *         in: formData
- *         required: false
+ *         required: true
  *         type: string
  *       responses:
  *           '200':
@@ -398,7 +393,7 @@ app.post('/chess/moves', (req, res) => {
  *   post: 
  *       description: Create a new chess game
  *       tags:
- *           - Logic
+ *           - Chess
  *       parameters:
  *       - name: PlayerID
  *         description: ID of the user creating the game
@@ -468,7 +463,28 @@ app.post('/chess/NewGame', (req, res) => {
 });
 
 
-
+/**
+ * @swagger
+ * /chess/reconnect:
+ *   post: 
+ *       description: Reconnect to existing game
+ *       tags:
+ *           - Chess
+ *       parameters:
+ *       - name: username
+ *         description: Name of the user rejoining the game
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: gameID
+ *         description: ID of the game you wish to rejoin
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: {}
+ */
 app.post('/chess/reconnect', (req, res) => {
     const {username, gameID } = req.body
     let team
