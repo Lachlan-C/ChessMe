@@ -10,7 +10,7 @@ if "!output!" EQU " " (
 ) else (
     echo Installed
 )
-if exist package-lock.json (
+if exist node_modules (
     echo dependencies already installed
 ) else (
     echo installing dependencies
