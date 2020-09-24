@@ -15,6 +15,7 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect
 } from "react-router-dom";
 
 class App extends React.Component {
@@ -64,7 +65,7 @@ class App extends React.Component {
               <Header loggedIn={this.state.loggedIn} handleClick={this.handleLogout}/>
               <Switch>
                 <Route path="/game-history">
-                  <GameHistory/>
+                  {this.state.loggedIn ? <GameHistory/> : <Redirect to="/login"/>}
                 </Route>
                 <Route path="/registration">
                   <Registration/>
@@ -80,16 +81,16 @@ class App extends React.Component {
                   />
                 </Route>
                 <Route path="/create-game">
-                  <CreateGame/>
+                  {this.state.loggedIn ? <CreateGame/> : <Redirect to="/login"/>}
                 </Route>
                 <Route path="/About">
                   <About/>
                 </Route>
                 <Route path="/configuration">
-                  <Configuration/>
+                  {this.state.loggedIn ? <Configuration/> : <Redirect to="/login"/>}
                 </Route>
                 <Route path="/">
-                  <Game />
+                  {this.state.loggedIn ? <Game/> : <Redirect to="/login"/>}
                 </Route>
               </Switch>
           </Router>
