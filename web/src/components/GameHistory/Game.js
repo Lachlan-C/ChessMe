@@ -87,14 +87,17 @@ class Game extends React.Component {
     {
         if (!this.props.status)
         {
-
             //sends the reconnect request
             $.post(`${process.env.REACT_APP_API_URL}/chess/reconnect`, {"gameID": this.props.gameID, "username": localStorage.getItem('user')}).then(response => {
                 window.alert(response);
             })
         }
         else
-            return
+        {
+            $.post(`${process.env.REACT_APP_API_URL}/chess/replay`, {"GameID": this.props.gameID, "Index": this.state.index}).then(response => {
+                console.log(response)
+            })
+        }
     }
 
     render()

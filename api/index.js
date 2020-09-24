@@ -299,63 +299,63 @@ app.post('/validate/move', (req, res) => {
     //Searches for game with supplied GameID 
     //@@@@@NOTE: ERROR HANDLING ???? PROBABLY A GOOD IDEA!
     Game.findOne({GameID: GameID}, (err, data) => {
-
-        //Creates new Game
-        chessGame = new Chess(data.CurrentFen);
         
-        //check to see if Correct user is making the move
-        var valid = false; 
+         //Creates new Game
+         chessGame = new Chess(data.CurrentFen);
         
-        if (chessGame.turn() === 'b')
-        { 
-            if (data.Users[1] === UserID)
-            {
-                //Updates the Game with the Move/Validates
-                valid = onDrop(move)
-            }
-        }
-        if (chessGame.turn() === 'w')
-        {   
-            if (data.Users[0] === UserID)
-            {
-                //Updates the Game with the Move/Validates
-                valid = onDrop(move)
-            }
-        }
-
-        //Status Check (has someone won?)
-        const status = updateStatus()
-        res.send({
-            valid: valid, 
-            FEN: chessGame.fen(), 
-            status: status,
-            move: move,
-            Users: data.Users
-        });
-
-        //Update DB if valid move
-        if (valid)
-        {
-            //Update current board state
-            data.CurrentFen = chessGame.fen()
-            //GameOver Update Winner
-            if (chessGame.game_over())
-                data.Winner = status
-            //Add the move to the moves array
-            data.Moves.push(move)
+         //check to see if Correct user is making the move
+         var valid = false; 
+         
+         if (chessGame.turn() === 'b')
+         { 
+             if (data.Users[1] === UserID)
+             {
+                 //Updates the Game with the Move/Validates
+                 valid = onDrop(move)
+             }
+         }
+         if (chessGame.turn() === 'w')
+         {   
+             if (data.Users[0] === UserID)
+             {
+                 //Updates the Game with the Move/Validates
+                 valid = onDrop(move)
+             }
+         }
+ 
+         //Status Check (has someone won?)
+         const status = updateStatus()
+         res.send({
+             valid: valid, 
+             FEN: chessGame.fen(), 
+             status: status,
+             move: move,
+             Users: data.Users
+         });
             
-            //Save the Updates to the DB
-            data.save(err => {
-                if (err) {
-                    console.log(err)
-                }
-            })}
-    })
+            //Update DB if valid move
+            if (valid)
+            {
+                //Update current board state
+                data.CurrentFen = chessGame.fen()
+                //GameOver Update Winner
+                if (chessGame.game_over())
+                data.Winner = status
+                //Add the move to the moves array
+                data.Moves.push(move)
+                
+                //Save the Updates to the DB
+                data.save(err => {
+                    if (err) {
+                        console.log(err)
+                    }
+                })}
+        })
 });
-
-/**
- * @swagger
- * /chess/moves:
+        
+        /**
+         * @swagger
+         * /chess/moves:
  *   post: 
  *       description: Show possible moves for a piece
  *       tags:
@@ -423,7 +423,7 @@ app.post('/chess/NewGame', (req, res) => {
         {
             return res.send("ERROR GAME ALREADY RUNNING");
         } 
-
+        
         else 
         {
             const newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();  
@@ -461,6 +461,80 @@ app.post('/chess/NewGame', (req, res) => {
         }
     })
 });
+
+/**
+ * @swagger
+ * /chess/replay:
+ *   post: 
+ *       description: Create a new chess game from point specified in another game
+ *       tags:
+ *           - Chess
+ *       parameters:
+ *       - name: GameID
+ *         description: ID of the game
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       - name: Index
+ *         description: Move index at which to start from
+ *         in: formData
+ *         required: true
+ *         type: string
+ *       responses:
+ *           '200':
+ *               description: GameID {12482373}
+ */
+app.post('/chess/replay', (req, res) => {
+    const {
+        GameID,
+        Index
+    } = req.body;
+    Game.findOne({
+        "GameID": GameID
+    }, (err, data) => {
+            const newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();  
+            movesArray = data.Moves.slice(0, Index)
+            const FEN = toFEN(movesArray);
+            const Users = data.Users
+            const CurrentDate = new Date();
+            const Moves = movesArray
+
+
+            User.find({'userID': Users}, (err, user) => {
+                let boardID = []
+                if (user[1])
+                    boardID = [user[0].boardID, user[1].boardID]
+                else
+                    boardID = [user[0].boardID, null]
+
+                const body = {
+                    gameID: newGameID,
+                    boardID: boardID,
+                    userID: Users,
+                    FEN: FEN
+                }
+
+                fetch(`${MQTT_URL}/game/connect`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+                .then(response => response.text())
+                .then(response => 
+                    {
+                        console.log(response)
+                    })
+
+            new Game({
+                GameID: newGameID,
+                DateTimeStart: CurrentDate,
+                Users: Users,
+                CurrentFen: FEN,
+                Moves
+            }).save();
+            
+            res.send(newGameID);
+        })
+    })
+})
+
+
 
 
 /**
