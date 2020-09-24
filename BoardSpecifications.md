@@ -86,10 +86,12 @@ the endpoints that will be defined later in this document.
          }
          ```
          Requesting hints from the Chess-Engine (**Unfinished)
+         ```
          {
             "userID": userid, 
             "request": "hint"
          }
+         ```
 <br/><br/>   
 ## Conclusion
 Boards can be expanded for greater functionality, however this is what is able to be communicated through MQTT using the ChessMe API. Further information on particular methdos can be seen in the documentation for MQTT. Additionally, within the [Board folder](board), a working board system can be found.
