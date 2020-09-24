@@ -49,7 +49,7 @@ the endpoints that will be defined later in this document.
             request: 'connect',
             team: 'black',
             FEN: FEN,
-            server:true
+            server: true
         }
         ```
         No response is required for this request.
@@ -77,21 +77,38 @@ the endpoints that will be defined later in this document.
 <br/><br/>   
 ## Additional Functionality 
          Requesting possible moves for a piece
-
-         ```
+```
+         Request:
          {
             "userID": userid, 
             "piecePos": 'a7',
             "request": "piecemoves"
          }
-         ```
+         
+         Response:
+         {
+            "Users": [userid, null],
+            "server": true,
+            "moves": [e2, e3], 
+            "request": "piecemoves"
+         }
+```
          Requesting hints from the Chess-Engine (**Unfinished)
-         ```
+```      
+         Request:
          {
             "userID": userid, 
             "request": "hint"
          }
-         ```
+         Response:
+         {
+            "Users": [userid, null],
+            "server": true,
+            "move": 'e5e6',
+            "FEN": FEN,
+            "request": "hint" 
+         }
+```
 <br/><br/>   
 ## Conclusion
 Boards can be expanded for greater functionality, however this is what is able to be communicated through MQTT using the ChessMe API. Further information on particular methdos can be seen in the documentation for MQTT. Additionally, within the [Board folder](board), a working board system can be found.
