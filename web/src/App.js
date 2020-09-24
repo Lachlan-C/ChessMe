@@ -33,7 +33,7 @@ class App extends React.Component {
     }
     
     onLogin(){
-      $.post(`${process.env.REACT_APP_API_URL}user/login`,{'username': this.state.username, 'password': this.state.password}).then(response => {
+      $.post(`${process.env.REACT_APP_API_URL}/user/login`,{'username': this.state.username, 'password': this.state.password}).then(response => {
           console.log(response)
           if (!response.success) this.setState({response: response.message, error: true});
           else 
