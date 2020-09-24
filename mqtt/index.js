@@ -33,7 +33,7 @@ const client = mqtt.connect(BROKER)
 
 //Connection confirmation
 client.on('connect', () => {
-    client.subscribe(`${MQTT_PATH}/#`, err => {
+    client.subscribe(`${MQTT_PATH}/#`,qos = 2, err => {
         if (!err) console.log(`Subscribed to ${MQTT_PATH}/#`);
     });
 });
@@ -91,7 +91,7 @@ app.post('/board/pair', (req, res) => {
 //Publish message to topic
 function send(topic, msg)
 {
-    client.publish(topic, msg, () => {
+    client.publish(topic, msg, qos = 2, () => {
         console.log(`Message Sent to ${topic}, Message: ${msg}`);
     });
 }
