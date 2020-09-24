@@ -75,7 +75,7 @@ the endpoints that will be defined later in this document.
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Origin position of Piece moved + Final position of Piece moved.  
         request should always be equal to `'validate'`
 <br/><br/>   
-##Additional Functionality 
+## Additional Functionality 
          Requesting possible moves for a piece
 
          ```
