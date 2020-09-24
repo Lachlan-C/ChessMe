@@ -5,6 +5,7 @@ For a chess game to be played, the following physical hardware requirements must
 
 1. The board should be able to move all of the pieces to match a FEN string.  
    - A FEN string is a string representation of the state of a chessboard.
+   - It is possible to update the Board using a move, however FEN string should be used for simplicity.
 
 2. If a piece should not be on the board (ie. a piece is taken), then the piece should be moved to a side area so that it can be accessed if needed (ie. a pawn promotion requires the new piece)
 
