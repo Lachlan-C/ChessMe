@@ -5,7 +5,7 @@ const jquery = require('jquery');
 const { basename } = require('path');
 
 var gameID, team, sendMessage, FEN;
-const boardID = 2222;//1111
+const boardID = 1111;//2222
 
 const app = express();
 
