@@ -76,38 +76,40 @@ the endpoints that will be defined later in this document.
         request should always be equal to `'validate'`
 <br/><br/>   
 ## Additional Functionality 
-         Requesting possible moves for a piece
+The following functions can be implemented on a Physical board, however are not required for the system to function correctly.
+<br/><br/>
+- Requesting possible moves for a piece
 ```
-         Request:
-         {
-            "userID": userid, 
-            "piecePos": 'a7',
-            "request": "piecemoves"
-         }
+Request:
+{
+  "userID": userid, 
+  "piecePos": 'a7',
+  "request": "piecemoves"
+}
          
-         Response:
-         {
-            "Users": [userid, null],
-            "server": true,
-            "moves": [e2, e3], 
-            "request": "piecemoves"
-         }
+Response:
+{
+  "Users": [userid, null],
+  "server": true,
+  "moves": [e2, e3], 
+  "request": "piecemoves"
+}
 ```
-         Requesting hints from the Chess-Engine (**Unfinished)
+- Requesting hints from the Chess-Engine (**Unfinished)
 ```      
-         Request:
-         {
-            "userID": userid, 
-            "request": "hint"
-         }
-         Response:
-         {
-            "Users": [userid, null],
-            "server": true,
-            "move": 'e5e6',
-            "FEN": FEN,
-            "request": "hint" 
-         }
+Request:
+{
+  "userID": userid, 
+  "request": "hint"
+}
+Response:
+{
+  "Users": [userid, null],
+  "server": true,
+  "move": 'e5e6',
+  "FEN": FEN,
+  "request": "hint" 
+}
 ```
 <br/><br/>   
 ## Conclusion
