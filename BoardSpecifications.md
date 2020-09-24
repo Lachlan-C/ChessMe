@@ -65,7 +65,7 @@ the endpoints that will be defined later in this document.
      - A move validation request should be sent as a string of a JSON object with the following fields:
         ```
         {
-            UserID: userID,
+            userID: userID,
             move: 'e5e6',
             request: 'validate'
         }

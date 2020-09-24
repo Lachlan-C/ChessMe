@@ -90,7 +90,7 @@ app.post('/newMove', (req,res)=> {
         return;
     }
     const moveSend = {
-        UserID: `${userID}`,
+        userID: `${userID}`,
         move: `${req.body.Move}`,
         request: 'validate'
     }
