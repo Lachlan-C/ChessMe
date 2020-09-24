@@ -86,7 +86,18 @@ app.post('/board/pair', (req, res) => {
     res.send('message has been sent!')
 })
 
-
+//Updates the board.
+app.post('/game/update', (req,res) => {
+    const {userID, GameID, FEN} = req.body;
+    const request = {
+        userID: userID,
+        FEN: FEN,
+        GameID: GameID,
+        request: 'update'
+    }
+    send(`/AkdsmDm2sn/chessme/game/${GameID}`, JSON.stringify(request));
+    res.send('message has been sent!');
+});
 
 //Publish message to topic
 function send(topic, msg)

@@ -71,7 +71,7 @@ client.on('message', (topic, message) => {
             }
         }else if (topic[2].match('game')) {
             if (topic[3] === gameID){
-                if(mes.request === 'validate'){
+                if((mes.request === 'validate')||(mes.request === 'update')){
                     FEN = mes.FEN
                     console.log(FEN);
                 }
