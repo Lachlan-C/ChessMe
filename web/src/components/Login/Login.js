@@ -19,7 +19,7 @@ class Login extends React.Component {
             
             <label htmlFor="login-pass">password</label>
             <input 
-                type="text" 
+                type="password" 
                 className="form-control" 
                 id="login-pass" 
                 name="password" 

@@ -47,7 +47,7 @@ class Registration extends React.Component {
             
             <label htmlFor="login-pass">password</label>
             <input 
-                type="text" 
+                type="password" 
                 className="form-control" 
                 id="login-pass" 
                 name="password" 
@@ -57,7 +57,7 @@ class Registration extends React.Component {
             
             <label htmlFor="login-confirm">confirm password</label>
             <input 
-                type="text" 
+                type="password" 
                 className="form-control" 
                 id="login-confirm" 
                 name="confirm" 
