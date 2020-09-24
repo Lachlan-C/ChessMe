@@ -28,7 +28,7 @@ const client = mqtt.connect("mqtt://broker.hivemq.com:1883");
 
 client.on('connect', () => {
     console.log('Connected'); //Can access the mqtt broker.
-    client.subscribe(`${mqtt_base_path}/#`, err => {
+    client.subscribe(`${mqtt_base_path}/#`, qos = 2, err => {
         if (!err) console.log(`Subscribed to ${mqtt_base_path}/#`);
     });
     //client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":"00000001","request":"pair","server":"true"}));
@@ -53,7 +53,7 @@ client.on('message', (topic, message) => {
                     if (mes.server) {
                         userID = mes.userID;
                         app.locals.USER_ID = userID
-                        client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":`${userID}`,"request":"pair"}));
+                        client.publish(`${mqtt_base_path}/board/${boardID}`, JSON.stringify({"userID":`${userID}`,"request":"pair"}),qos=2);
                         console.log('Paired');
                     }
                 }else if(mes.request === 'connect') {
@@ -94,14 +94,14 @@ app.post('/newMove', (req,res)=> {
         move: `${req.body.Move}`,
         request: 'validate'
     }
-    client.publish(`${mqtt_base_path}/game/${gameID}`, JSON.stringify(moveSend));
+    client.publish(`${mqtt_base_path}/game/${gameID}`, JSON.stringify(moveSend), qos = 2);
     setTimeout(()=>{res.send(FEN)},1000);
 });
 
 //Testing connection with test button
 app.post('/testSend', (req,res)=>{
     console.log("request: ",req.body);
-    client.publish(`${mqtt_base_path}/test`, JSON.stringify(`{Name: ${req.body.Name}}`));
+    client.publish(`${mqtt_base_path}/test`, JSON.stringify(`{Name: ${req.body.Name}}`),qos=2);
     setTimeout(()=>{res.send(sendMessage)},1000);
 });
 
