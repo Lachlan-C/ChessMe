@@ -288,7 +288,7 @@ function onDrop (move) {
 app.post('/validate/move', (req, res) => {
 
     const {
-        UserID,
+        userID,
         move,
         GameID
     } = req.body;
@@ -308,7 +308,7 @@ app.post('/validate/move', (req, res) => {
          
          if (chessGame.turn() === 'b')
          { 
-             if (data.Users[1] === UserID)
+             if (data.Users[1] === userID)
              {
                  //Updates the Game with the Move/Validates
                  valid = onDrop(move)
@@ -316,7 +316,7 @@ app.post('/validate/move', (req, res) => {
          }
          if (chessGame.turn() === 'w')
          {   
-             if (data.Users[0] === UserID)
+             if (data.Users[0] === userID)
              {
                  //Updates the Game with the Move/Validates
                  valid = onDrop(move)
@@ -378,11 +378,16 @@ app.post('/validate/move', (req, res) => {
 app.post('/chess/moves', (req, res) => {
     const {
         GameID,
-        piecePos
+        piecePos,
+        userID
     } = req.body;
     Game.findOne({GameID: GameID}, (err, data) => {
+        let Users = [userID, null];
+        if (userID == data.Users[1])
+            Users = [null, userID]
+
         chessGame = new Chess(data.CurrentFen)
-        res.send(chessGame.moves({ square: piecePos }))
+        res.send({moves: chessGame.moves({ square: piecePos }), Users: Users })
     })
 });
 
