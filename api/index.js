@@ -370,7 +370,7 @@ app.post('/validate/move', (req, res) => {
                                 }
                                 fetch(`${API_URL}/validate/move`, { method: 'POST', body: JSON.stringify(body2), headers: { 'Content-Type': 'application/json' }} )
                                 .then(response => {
-                                    fetch(`${MQTT_URL}/game/update`,JSON.stringify(response))
+                                    fetch(`${MQTT_URL}/game/update`,{method: 'POST',body: JSON.stringify(response), headers:{ 'Content-Type': 'application/json' }})
                                 })
                             })
                     }

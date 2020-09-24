@@ -4,13 +4,10 @@ const bodyParser = require('body-parser');
 const jquery = require('jquery');
 const { basename } = require('path');
 const dotenv = require('dotenv');
-
-dotenv.config();
-
-const {BOARD_ID} = process.env;
+const { Console } = require('console');
 
 var gameID, team, sendMessage, FEN;
-const boardID = BOARD_ID
+const boardID = 1111;
 
 const app = express();
 
@@ -51,6 +48,7 @@ client.on('message', (topic, message) => {
         //parses message to a JSON object
         const mes = JSON.parse(message);
         //Checks topic = 'board'
+        console.log(topic[2]);
         if (topic[2].match(`board`)){
             //Checks boardID is valid.
             if(topic[3] == boardID) {

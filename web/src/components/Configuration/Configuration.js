@@ -24,7 +24,7 @@ class Configuration extends React.Component {
 
     handleClick()
     {
-        $.post(`${process.env.REACT_APP_MQTT_URL}board/pair`,{'boardID': this.state.boardID, 'userID': this.state.userID}).then(response => {
+        $.post(`${process.env.REACT_APP_MQTT_URL}/board/pair`,{'boardID': this.state.boardID, 'userID': this.state.userID}).then(response => {
             console.log(`Pairing response: ${response}`)
         });
     }
