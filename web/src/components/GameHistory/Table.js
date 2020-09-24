@@ -9,16 +9,19 @@ class Table extends React.Component {
             <tr key={index} className={this.props.index===index ? "table-primary" : ""}><td >{item}</td></tr>
         ))
         return (
-            <table className="table">
-            <thead>
-                <tr>
-                    <th>Moves</th>
-                </tr>
-            </thead>
-            <tbody>
-                {Body}
-            </tbody>
-            </table>
+
+            <div style={{maxHeight: "15%", height: "200px", overflowY: "auto", width: "100%"}}>
+                <table className="table">
+                <thead>
+                    <tr>
+                        <th>Moves</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Body}
+                </tbody>
+                </table>
+            </div>
         )
     }
 }
