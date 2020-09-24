@@ -21,7 +21,7 @@ const bodyParser = require('body-parser');
 
 dotenv.config();
 
-const { MONGO_URL, PORT, MQTT_URL } = process.env;
+const { MONGO_URL, PORT, MQTT_URL, API_URL} = process.env;
 const app = express();
 
 mongoose.connect(MONGO_URL, {useNewUrlParser:true, useUnifiedTopology:true});
@@ -247,7 +247,6 @@ function onDrop (move) {
         move, 
         { sloppy: true, promotion:'q' } 
     )
-    
     if (move === null) {
         //Invalid Move
         return false
@@ -276,7 +275,7 @@ function onDrop (move) {
  *         in: formData
  *         required: true
  *         type: string
- *       - name: UserID
+ *       - name: userID
  *         description: ID of the user sending the move
  *         in: formData
  *         required: true
@@ -319,10 +318,9 @@ app.post('/validate/move', (req, res) => {
              if (data.Users[0] === userID)
              {
                  //Updates the Game with the Move/Validates
-                 valid = onDrop(move)
+                 valid = onDrop(move);
              }
          }
- 
          //Status Check (has someone won?)
          const status = updateStatus()
          res.send({
@@ -349,7 +347,32 @@ app.post('/validate/move', (req, res) => {
                     if (err) {
                         console.log(err)
                     }
-                })}
+                })
+                //game stockfish player responds
+                if (data.Users[1] === "" )
+                {
+                    if (chessGame.turn() === 'b') {
+                        
+                        const body = {
+                            FEN: chessGame.fen(),
+                            difficulty: "20"
+                        }
+            
+                        fetch(`${API_URL}/stockfish/move`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
+                        .then(response => response.text())
+                        .then(response => 
+                            {
+                                console.log(response)
+                                const body2 = {
+                                    userID: "",
+                                    move: response,
+                                    GameID: data.GameID
+                                }
+                                fetch(`${API_URL}/validate/move`, { method: 'POST', body: JSON.stringify(body2), headers: { 'Content-Type': 'application/json' }} )
+                            })
+                    }
+                }
+            }
         })
 });
         
@@ -428,7 +451,6 @@ app.post('/chess/NewGame', (req, res) => {
         {
             return res.send("ERROR GAME ALREADY RUNNING");
         } 
-        
         else 
         {
             const newGameID = (math.floor((math.random() * math.floor(99999999)))).toString();  
@@ -436,9 +458,12 @@ app.post('/chess/NewGame', (req, res) => {
             const Users = [PlayerID, EnemyID]
             const CurrentDate = new Date();
 
-
             User.find({'userID': Users}, (err, user) => {
-                const boardID = [user[0].boardID, user[1].boardID]
+                var EnemyBoardID = null;
+                if (EnemyID != "") {
+                    EnemyBoardID = user[1].boardID;
+                }
+                const boardID = [user[0].boardID, EnemyBoardID]
                 
                 const body = {
                     gameID: newGameID,
