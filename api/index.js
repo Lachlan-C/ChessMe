@@ -369,8 +369,8 @@ app.post('/validate/move', (req, res) => {
                                     GameID: data.GameID
                                 }
                                 fetch(`${API_URL}/validate/move`, { method: 'POST', body: JSON.stringify(body2), headers: { 'Content-Type': 'application/json' }} )
-                                .then(response => {
-                                    fetch(`${MQTT_URL}/game/update`,{method: 'POST',body: JSON.stringify(response), headers:{ 'Content-Type': 'application/json' }})
+                                .then(()=> {
+                                    fetch(`${MQTT_URL}/game/update`,{method: 'POST',body: JSON.stringify({userID:"",FEN: chessGame.fen(),GameID: data.GameID}), headers:{ 'Content-Type': 'application/json' }})
                                 })
                             })
                     }
