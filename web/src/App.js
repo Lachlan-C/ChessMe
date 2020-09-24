@@ -35,11 +35,10 @@ class App extends React.Component {
     onLogin(){
       $.post(`${process.env.REACT_APP_API_URL}/user/login`,{'username': this.state.username, 'password': this.state.password}).then(response => {
           console.log(response)
-          if (response === 'userError') this.setState({response: "username does not exist", error: true});
-          else if(response === 'passError') this.setState({response: "password is incorrect", error: true});
+          if (!response.success) this.setState({response: response.message, error: true});
           else 
           {
-              this.setState({loggedIn: true, error: false, response: ''});
+              this.setState({loggedIn: true, error: false, response: response.message});
               localStorage.setItem('user', this.state.username)
           }
       });

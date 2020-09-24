@@ -578,11 +578,11 @@ app.post('/user/login', (req, res)=> {
     const {password} = req.body;
 
     User.findOne({'username': username},(err,loggedUser)=>{
-        if (!loggedUser) res.send('userError');
+        if (!loggedUser) res.send({success: false ,message: "username was not found"});
         else if (loggedUser.password == password) {
-            return res.send('loggedIn');
+            return res.send({success: true ,message: "successfully logged in!"});
         }else{
-            return res.send('passError');
+            return res.send({success: false ,message: "password does not match"});
         }
     });
 });
