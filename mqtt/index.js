@@ -122,20 +122,20 @@ function validate(body)
 //show possible moves for a piece
 function pieceMoves(body)
 {
-        //atm it needs GameID, piecePos
+        //Example -t /AkdsmDm2sn/chessme/game/57183898 -m '{"userID": "00000001", "request": "piecemoves", "piecePos": "a7"}' 
+        //atm it needs userID, GameID, piecePos
         fetch(`${API_URL}/chess/moves`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
         .then(response => response.json())
         .then(json => 
             {
                 console.log("Response:")
                 console.log(json)
-                //expected response {moves: [e2, e3], userID: ['xxx']}
+                //expected response {moves: [e2, e3], Users: [00000001, null], server: true, request: piecemoves}
                 //publish message to channel /AkdsmDm2sn/chessme/game/:gameid
 
-                //send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
-
-                //get gameID from body.gameID
-                //here send message back to game channel w/ user identifier
+                json.server = true
+                json.request = 'piecemoves'
+                send(`${MQTT_PATH}/game/${body.GameID}`, JSON.stringify(json)) 
             })
 }
 
@@ -216,8 +216,8 @@ client.on('message', (topic, message) => {
             OR
             {
                 userID: 6942
-                request: piece-moves
-                piece: e2
+                request: piecemoves
+                piecePos: e2
             }
             OR
             {
