@@ -3,9 +3,14 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const jquery = require('jquery');
 const { basename } = require('path');
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const {BOARD_ID} = process.env;
 
 var gameID, team, sendMessage, FEN;
-const boardID = 1111;//2222
+const boardID = BOARD_ID
 
 const app = express();
 
