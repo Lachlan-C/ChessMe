@@ -8,7 +8,7 @@ export function handleChange(e) {
 
 export function handleChange20(e) {
     const { name, value } = e.target
-    if (value <= 20 && value >= 0)
+    if (value.match(/^([0-1]?[0-9]|20|^$)$/))
     {
         this.setState({
             [name]: value

@@ -1,7 +1,7 @@
 import React from 'react';
 import Team from './Team';
 import Challenger from './Challenger';
-import { handleChange } from '../../Helpers'
+import { handleChange, handleChange20 } from '../../Helpers'
 import $ from 'jquery'
 
 
@@ -19,12 +19,14 @@ class CreateGame extends React.Component {
         this.handleClick = this.handleClick.bind(this)
         this.handleTeam = this.handleTeam.bind(this)
         this.handleChallengerRadio = this.handleChallengerRadio.bind(this)
+        this.handleDifficulty = handleChange20.bind(this)
     }
 
     //handle form submission
     handleClick() {
         let PlayerID
         let EnemyID
+        let Difficulty
         $.get(`${process.env.REACT_APP_API_URL}/user/${localStorage.getItem('user')}`).then(user => {      
                 if (!this.state.isCPU)
                 {
@@ -39,9 +41,13 @@ class CreateGame extends React.Component {
                         PlayerID = user[0].userID
                     }
                 }
-                //Add enemy is not cpu?????
-                
-                $.post(`${process.env.REACT_APP_API_URL}/chess/NewGame`,{PlayerID:PlayerID, EnemyID:EnemyID}).then(response => {
+                else
+                {
+                    PlayerID = user[0].userID;
+                    EnemyID = ""
+                    Difficulty = this.state.Challenger
+                }
+                $.post(`${process.env.REACT_APP_API_URL}/chess/NewGame`,{PlayerID:PlayerID, EnemyID:EnemyID, Difficulty}).then(response => {
                     console.log(response)
                 });
         })
@@ -49,15 +55,20 @@ class CreateGame extends React.Component {
 
     //handle the team
     handleTeam(e) {
-        this.setState((prevState) => ({
-            Team: prevState.Team === 'black' ? 'white' : 'black'
-        }))
+        if (!this.state.isCPU)
+        {
+            this.setState((prevState) => ({
+                Team: prevState.Team === 'black' ? 'white' : 'black'
+            }))
+        }
     }
 
     //Handler for the 'Challenger Radio Button'
     handleChallengerRadio() {
         this.setState(prevState => ({
-            isCPU: !prevState.isCPU
+            isCPU: !prevState.isCPU,
+            Team: 'white',
+            Challenger: ""
         }))
     }
 
@@ -71,7 +82,7 @@ class CreateGame extends React.Component {
                     <Challenger 
                         handleRadio={this.handleChallengerRadio} 
                         isCPU={this.state.isCPU}
-                        handleChange={this.handleChallenger} 
+                        handleChange={this.state.isCPU ? this.handleDifficulty : this.handleChallenger} 
                         Challenger={this.state.Challenger} 
                     /> 
                     <br></br>
