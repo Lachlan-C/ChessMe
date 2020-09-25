@@ -7,5 +7,6 @@ module.exports = mongoose.model('Game', new mongoose.Schema({
     Users: Array,
     Moves: Array,
     CurrentFen: String,
-    Winner: String
+    Winner: String,
+    Difficulty: String
 }, {collection: 'games'}));

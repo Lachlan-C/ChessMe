@@ -289,7 +289,8 @@ app.post('/validate/move', (req, res) => {
     const {
         userID,
         move,
-        GameID
+        GameID,
+        Difficulty
     } = req.body;
 
     //Need to check if the user is sending a move for the right team!
@@ -355,7 +356,7 @@ app.post('/validate/move', (req, res) => {
                         
                         const body = {
                             FEN: chessGame.fen(),
-                            difficulty: "20"
+                            difficulty: data.Difficulty || "10"
                         }
             
                         fetch(`${API_URL}/stockfish/move`, { method: 'POST', body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }} )
@@ -443,7 +444,8 @@ app.post('/chess/moves', (req, res) => {
 app.post('/chess/NewGame', (req, res) => {
     const {
         PlayerID,
-        EnemyID
+        EnemyID,
+        Difficulty
     } = req.body;
     Game.findOne({
         "Users": PlayerID,
@@ -486,7 +488,8 @@ app.post('/chess/NewGame', (req, res) => {
                 GameID: newGameID,
                 DateTimeStart: CurrentDate,
                 Users: Users,
-                CurrentFen: FEN
+                CurrentFen: FEN,
+                Difficulty: Difficulty
             }).save();
             
             res.send(newGameID);
