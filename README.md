@@ -14,7 +14,7 @@ https://trello.com/b/YcHyE4Pq/chessme
 
 ## Self hosted
 If you would like to run this yourself please use our docker install scripts to get it running.  
-1. First thing that you will need to do is make sure that you run have all of the parts of the project which you will need to host. These are the MQTT, API and WEB. All of these need to be run in order to get a fully functional system.
+1. First thing that you will need to do is make sure that you have all of the parts of the project which are need to host. These are the MQTT, API and WEB. All of these are needed in order to have a fully functional system.
    
 2. The next step that you need to do is add your own environment file in order to make sure that each of these sections can communicate with the other. This means that you will have to change up the URLs from being local host to the actual destination in which you will be using.
    
